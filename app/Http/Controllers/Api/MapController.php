@@ -20,7 +20,7 @@ class MapController extends Controller
     {
         $cacheKey = $this->buildCacheKey($request);
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($request): JsonResponse {
+        $data = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($request): array {
             $query = Sound::public()
                 ->select([
                     'id', 'slug', 'title', 'description', 'duration',
@@ -90,19 +90,21 @@ class MapController extends Controller
                 ];
             });
 
-            return response()->json([
+            return [
                 'type' => 'FeatureCollection',
                 'features' => $features,
-            ]);
+            ];
         });
+
+        return response()->json($data);
     }
 
     public function search(SearchMapRequest $request): JsonResponse
     {
         $query = $request->validated('q');
-        $cacheKey = 'map:search:'.md5($query);
+        $cacheKey = 'map:v2:search:'.md5($query);
 
-        return Cache::remember($cacheKey, 60, function () use ($query): JsonResponse {
+        $data = Cache::remember($cacheKey, 60, function () use ($query): array {
             $sounds = Sound::public()
                 ->select([
                     'id', 'slug', 'title', 'duration',
@@ -155,16 +157,18 @@ class MapController extends Controller
                 ];
             });
 
-            return response()->json([
+            return [
                 'type' => 'FeatureCollection',
                 'features' => $features,
-            ]);
+            ];
         });
+
+        return response()->json($data);
     }
 
     private function buildCacheKey(Request $request): string
     {
-        $parts = ['map:sounds'];
+        $parts = ['map:v2:sounds'];
 
         if ($request->filled('bounds')) {
             $bounds = $request->array('bounds');
