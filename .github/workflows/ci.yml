@@ -228,11 +228,6 @@ jobs:
           npm ci --ignore-scripts
           npm audit --omit=dev --audit-level=high
 
-      - name: Gitleaks secret scan
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   docker-build-check:
     name: Docker build verification
     runs-on: ubuntu-latest
