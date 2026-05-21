@@ -1,0 +1,181 @@
+/* Map-specific styles — loaded only on /map page to reduce main CSS bundle */
+
+/* Map sidebar sound list item */
+.map-sound-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.625rem;
+    border-radius: 0.5rem;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    cursor: pointer;
+    background: rgba(243, 240, 231, 0.026);
+}
+.map-sound-item:hover {
+    background: rgba(243, 240, 231, 0.055);
+    border-color: rgba(215, 180, 106, 0.22);
+    transform: translateX(2px);
+}
+.map-sound-item-active {
+    background: rgba(143, 230, 193, 0.08) !important;
+    border-color: rgba(143, 230, 193, 0.35) !important;
+    box-shadow: 0 0 0 1px rgba(143, 230, 193, 0.06), 0 12px 32px rgba(0, 0, 0, 0.18);
+}
+
+/* Map ambient glow behind sidebar */
+.map-ambient-glow {
+    position: absolute;
+    pointer-events: none;
+    background: radial-gradient(ellipse 60% 40% at 15% 30%, rgba(52, 211, 153, 0.06), transparent 70%);
+}
+
+/* Title fade out */
+.map-title-fade {
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.map-title-hidden {
+    opacity: 0;
+    transform: translateY(-20px);
+    pointer-events: none;
+}
+
+/* Waveform loader */
+.waveform-loader {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 16px;
+}
+.waveform-loader span {
+    width: 2px;
+    background: #34D399;
+    border-radius: 1px;
+    animation: wave 0.8s ease-in-out infinite;
+}
+.waveform-loader span:nth-child(1) { height: 6px; animation-delay: 0s; }
+.waveform-loader span:nth-child(2) { height: 12px; animation-delay: 0.1s; }
+.waveform-loader span:nth-child(3) { height: 8px; animation-delay: 0.2s; }
+.waveform-loader span:nth-child(4) { height: 14px; animation-delay: 0.15s; }
+.waveform-loader span:nth-child(5) { height: 10px; animation-delay: 0.05s; }
+
+/* Search pulse animation */
+.search-pulse:focus {
+    animation: searchPulse 2s ease-in-out infinite;
+}
+
+/* Grain overlay for map page */
+.map-grain::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.015;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    z-index: 2;
+}
+
+/* Mobile sidebar slide */
+.mobile-sidebar {
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.mobile-sidebar-closed {
+    transform: translateX(-110%);
+}
+.mobile-sidebar-open {
+    transform: translateX(0);
+}
+
+/* Ripple effect on marker click */
+.map-ripple-container {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.map-ripple {
+    position: absolute;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    animation: mapRippleExpand 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    border: 2px solid currentColor;
+    background: radial-gradient(circle, currentColor 0%, transparent 70%);
+    opacity: 0.5;
+}
+
+.map-ripple-delayed {
+    animation-delay: 0.35s;
+}
+
+@keyframes mapRippleExpand {
+    0% {
+        width: 10px;
+        height: 10px;
+        opacity: 0.7;
+    }
+    100% {
+        width: 220px;
+        height: 220px;
+        opacity: 0;
+    }
+}
+
+/* Fog / vignette overlay for depth */
+.map-fog-vignette {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse 85% 70% at 50% 50%, transparent 30%, rgba(7, 17, 13, 0.5) 100%),
+        linear-gradient(90deg, rgba(7, 17, 13, 0.22), transparent 28%, transparent 72%, rgba(7, 17, 13, 0.22));
+}
+
+/* Leaflet base overrides */
+.leaflet-container {
+    background: #07110D !important;
+    font-family: 'DM Sans', system-ui, sans-serif;
+}
+
+.map-mode-pill {
+    min-height: 40px;
+    border-radius: 9999px;
+    border: 1px solid rgba(216, 208, 189, 0.14);
+    background: rgba(10, 13, 11, 0.42);
+    color: rgba(243, 240, 231, 0.68);
+    padding: 0.55rem 0.8rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.map-mode-pill:hover,
+.map-mode-pill-active {
+    border-color: rgba(215, 180, 106, 0.45);
+    background: rgba(215, 180, 106, 0.12);
+    color: #F3F0E7;
+}
+
+@media (max-width: 767px) {
+    .mobile-sidebar {
+        bottom: 0;
+        left: 0;
+        top: auto !important;
+        width: 100% !important;
+        max-width: none !important;
+        transform: translateY(calc(100% - 88px));
+        padding: 0 0.75rem 0.75rem;
+    }
+
+    .mobile-sidebar-open {
+        transform: translateY(0);
+    }
+
+    .mobile-sidebar-closed {
+        transform: translateY(calc(100% - 88px));
+    }
+}

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" baseProfile="tiny-ps" version="1.2">
+  <rect width="512" height="512" fill="#0B1220"/>
+  <path
+    d="M256 96C256 96 128 160 128 288C128 355.346 182.654 410 256 410C329.346 410 384 355.346 384 288C384 160 256 96 256 96Z"
+    stroke="#34D399"
+    stroke-width="24"
+    fill="none"
+  />
+  <path
+    d="M256 410V496"
+    stroke="#34D399"
+    stroke-width="24"
+  />
+  <path
+    d="M192 464H320"
+    stroke="#34D399"
+    stroke-width="24"
+  />
+  <path
+    d="M256 208 A 48 48 0 1 1 256 304 A 48 48 0 1 1 256 208 Z"
+    stroke="#34D399"
+    stroke-width="20"
+    fill="none"
+  />
+</svg>
