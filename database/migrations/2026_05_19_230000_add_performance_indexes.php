@@ -65,8 +65,8 @@ return new class extends Migration
 
         // Follows - social features
         Schema::table('follows', function (Blueprint $table) {
-            if (! $this->hasIndex('follows', 'follows_following_id_idx')) {
-                $table->index('following_id', 'follows_following_id_idx');
+            if (! $this->hasIndex('follows', 'follows_followed_id_idx')) {
+                $table->index('followed_id', 'follows_followed_id_idx');
             }
             if (! $this->hasIndex('follows', 'follows_created_at_idx')) {
                 $table->index('created_at', 'follows_created_at_idx');
@@ -136,7 +136,7 @@ return new class extends Migration
         });
 
         Schema::table('follows', function (Blueprint $table) {
-            $table->dropIndex(['follows_following_id_idx']);
+            $table->dropIndex(['follows_followed_id_idx']);
             $table->dropIndex(['follows_created_at_idx']);
         });
 
