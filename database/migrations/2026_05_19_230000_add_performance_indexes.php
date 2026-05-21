@@ -10,9 +10,6 @@ return new class extends Migration
     {
         // Sounds table - most queried table
         Schema::table('sounds', function (Blueprint $table) {
-            if (! $this->hasIndex('sounds', 'sounds_is_public_idx')) {
-                $table->index('is_public', 'sounds_is_public_idx');
-            }
             if (! $this->hasIndex('sounds', 'sounds_user_id_idx')) {
                 $table->index('user_id', 'sounds_user_id_idx');
             }
@@ -114,7 +111,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('sounds', function (Blueprint $table) {
-            $table->dropIndex(['sounds_is_public_idx']);
             $table->dropIndex(['sounds_user_id_idx']);
             $table->dropIndex(['sounds_category_id_idx']);
             $table->dropIndex(['sounds_environment_id_idx']);
