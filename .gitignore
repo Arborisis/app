@@ -41,5 +41,7 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 docker-compose*.yml
-Dockerfile*
 .dockerignore
+
+# Ne pas ignorer le Dockerfile pour Railway
+!Dockerfile
