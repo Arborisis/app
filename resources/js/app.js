@@ -7,7 +7,7 @@ import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createApp, h } from 'vue';
 import { createPinia } from 'pinia';
-import { ZiggyVue } from '../../vendor/tightenco/ziggy';
+import { ZiggyVue } from 'ziggy-js';
 import MiniPlayer from '@/Components/Audio/MiniPlayer.vue';
 import CookieBanner from '@/Components/CookieBanner.vue';
 import PwaInstallPrompt from '@/Components/PwaInstallPrompt.vue';
