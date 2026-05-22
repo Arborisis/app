@@ -1,0 +1,1 @@
+import{M as e,b as t}from"./inertia-BQVkfvId.js";import{t as n}from"./app-Rtd4TIdS.js";var r={},i={src:`/images/arborisis-site-logo-white.svg`,alt:`Arborisis`};function a(n,r){return e(),t(`img`,i)}var o=n(r,[[`render`,a]]);export{o as t};

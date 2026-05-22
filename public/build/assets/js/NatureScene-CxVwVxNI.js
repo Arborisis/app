@@ -1,0 +1,51 @@
+import{A as e,M as t,b as n,j as r,q as i}from"./inertia-BQVkfvId.js";import{A as a,C as o,D as s,E as c,M as l,N as u,O as d,T as f,_ as p,a as m,c as h,d as g,f as _,g as v,h as y,i as b,j as x,k as S,l as C,m as w,n as T,o as E,p as D,r as O,t as k,u as A,x as j}from"./threejs-D-fUmfoy.js";var M={__name:`NatureScene`,setup(M){let N=i(null),P,F,I,L,R,z=[],B,V,H=0,U=0,W=0,G=2,K=0,q=0,J={trunk:7029795,trunkDark:4073251,foliageDark:1786674,foliageMid:2976335,foliageLight:4231532,foliageEmerald:3462041,ground:1255955,groundLight:1786674,sky:725536,groundHemi:1715994};function Y(e,t,n=1,r=`pine`){let i=new v,a=1.2*n,s=new j(new _(.06*n,.16*n,a,7),new o({color:J.trunk,flatShading:!0,shininess:5}));if(s.position.y=a/2,s.castShadow=!0,s.receiveShadow=!0,i.add(s),n>1&&r===`pine`){let e=new g(.08*n,.3*n,5),t=new o({color:J.trunkDark,flatShading:!0,shininess:5});[-1,1].forEach(r=>{let o=new j(e,t);o.position.set(r*.18*n,a*.35,0),o.rotation.z=r*Math.PI/3,o.castShadow=!0,i.add(o)})}let c=r===`pine`?J.foliageMid:r===`dark`?J.foliageDark:J.foliageLight,l=new o({color:c,flatShading:!0,shininess:10});if(r===`pine`)[{y:a+.22*n,r:.6*n,h:.65*n},{y:a+.6*n,r:.45*n,h:.55*n},{y:a+.95*n,r:.28*n,h:.45*n}].forEach((e,t)=>{let n=new j(new g(e.r,e.h,8),l.clone());n.position.y=e.y;let r=new A(c);r.offsetHSL(0,0,(t-1)*.03),n.material.color=r,n.castShadow=!0,n.receiveShadow=!0,i.add(n)});else if(r===`round`){let e=new j(new w(.55*n,1),l);e.position.y=a+.45*n,e.castShadow=!0,e.receiveShadow=!0,i.add(e);let t=new j(new w(.38*n,1),l.clone());t.position.set(.18*n,a+.75*n,.12*n),t.material.color.offsetHSL(0,0,.04),t.castShadow=!0,i.add(t)}else{let e=new j(new g(.32*n,1.3*n,7),l);e.position.y=a+.55*n,e.castShadow=!0,e.receiveShadow=!0,i.add(e)}return i.position.set(e,0,t),i.userData={initialRotation:{x:0,z:0},swaySpeed:.4+Math.random()*.7,swayAmount:.015+Math.random()*.025,phase:Math.random()*Math.PI*2},i}function X(){let e=new c(30,30,12,12),t=e.attributes.position;for(let e=0;e<t.count;e++){let n=t.getX(e),r=t.getY(e),i=Math.sin(n*.4)*.12+Math.cos(r*.25)*.08+Math.sin(n*.8+r*.6)*.04;t.setZ(e,i)}e.computeVertexNormals();let n=new j(e,new o({color:J.ground,flatShading:!0,shininess:0}));return n.rotation.x=-Math.PI/2,n.position.y=-.1,n.receiveShadow=!0,n}function Z(){let e=new Float32Array(150),t=new Float32Array(150),n=new Float32Array(50),r=new Float32Array(50),i=new A;for(let a=0;a<50;a++){e[a*3]=(Math.random()-.5)*14,e[a*3+1]=.3+Math.random()*3.5,e[a*3+2]=(Math.random()-.5)*14;let o=Math.random();o<.4?i.setHex(J.foliageEmerald):o<.7?i.setHex(13935988):i.setHex(9414286),t[a*3]=i.r,t[a*3+1]=i.g,t[a*3+2]=i.b,n[a]=.025+Math.random()*.06,r[a]=Math.random()*Math.PI*2}let a=new C;return a.setAttribute(`position`,new h(e,3)),a.setAttribute(`color`,new h(t,3)),a.setAttribute(`size`,new h(n,1)),a.setAttribute(`phase`,new h(r,1)),new d(a,new x({uniforms:{uTime:{value:0}},vertexShader:`
+            attribute float size;
+            attribute vec3 color;
+            attribute float phase;
+            varying vec3 vColor;
+            varying float vAlpha;
+            uniform float uTime;
+
+            void main() {
+                vColor = color;
+                vec3 pos = position;
+                pos.x += sin(uTime * 0.7 + phase) * 0.35;
+                pos.y += cos(uTime * 0.45 + phase * 1.3) * 0.18 + sin(uTime * 1.1 + phase) * 0.08;
+                pos.z += sin(uTime * 0.55 + phase * 0.7) * 0.22;
+                vAlpha = 0.35 + 0.65 * pow(sin(uTime * 2.2 + phase), 2.0);
+                vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+                gl_PointSize = size * (450.0 / -mvPosition.z);
+                gl_Position = projectionMatrix * mvPosition;
+            }
+        `,fragmentShader:`
+            varying vec3 vColor;
+            varying float vAlpha;
+
+            void main() {
+                float dist = length(gl_PointCoord - vec2(0.5));
+                if (dist > 0.5) discard;
+                float alpha = (1.0 - smoothstep(0.08, 0.5, dist)) * vAlpha;
+                gl_FragColor = vec4(vColor * 1.3, alpha);
+            }
+        `,transparent:!0,depthWrite:!1,blending:2}))}function Q(){let e=new Float32Array(240),t=new Float32Array(80);for(let n=0;n<80;n++)e[n*3]=(Math.random()-.5)*16,e[n*3+1]=Math.random()*4,e[n*3+2]=(Math.random()-.5)*16,t[n]=.1+Math.random()*.3;let n=new C;return n.setAttribute(`position`,new h(e,3)),n.setAttribute(`speed`,new h(t,1)),new d(n,new x({uniforms:{uTime:{value:0}},vertexShader:`
+            attribute float speed;
+            varying float vAlpha;
+            uniform float uTime;
+            void main() {
+                vec3 pos = position;
+                pos.y += sin(uTime * speed + position.x) * 0.05;
+                pos.x += cos(uTime * speed * 0.7 + position.z) * 0.03;
+                vAlpha = 0.15 + 0.1 * sin(uTime * 0.5 + position.y);
+                vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+                gl_PointSize = 1.5 * (300.0 / -mvPosition.z);
+                gl_Position = projectionMatrix * mvPosition;
+            }
+        `,fragmentShader:`
+            varying float vAlpha;
+            void main() {
+                float dist = length(gl_PointCoord - vec2(0.5));
+                if (dist > 0.5) discard;
+                float alpha = (1.0 - smoothstep(0.1, 0.5, dist)) * vAlpha;
+                gl_FragColor = vec4(0.85, 0.9, 0.8, alpha);
+            }
+        `,transparent:!0,depthWrite:!1,blending:2}))}function $(){let e=new v,t=new o({color:4013373,flatShading:!0,shininess:15});for(let n=0;n<8;n++){let n=.08+Math.random()*.18,r=new j(new w(n,0),t);r.position.set((Math.random()-.5)*10,n*.25,(Math.random()-.5)*10),r.rotation.set(Math.random()*Math.PI,Math.random()*Math.PI,Math.random()*Math.PI),r.castShadow=!0,r.receiveShadow=!0,e.add(r)}return e}function ee(){let e=new v,t=[J.foliageMid,J.foliageLight,J.foliageDark];for(let n=0;n<120;n++){let n=t[Math.floor(Math.random()*t.length)],r=new o({color:n,flatShading:!0,shininess:0}),i=.08+Math.random()*.18,a=new j(new g(.015+Math.random()*.02,i,4),r),s=(Math.random()-.5)*14,c=(Math.random()-.5)*14,l=i/2;a.position.set(s,l,c),a.rotation.y=Math.random()*Math.PI,a.rotation.x=(Math.random()-.5)*.15,a.rotation.z=(Math.random()-.5)*.15,e.add(a)}return e}return e(()=>{let e=window.matchMedia(`(prefers-reduced-motion: reduce)`).matches;if(!N.value)return;q=performance.now();let t=N.value.clientWidth,n=N.value.clientHeight;F=new a,F.fog=new y(J.sky,.065),I=new f(45,t/n,.1,50),I.position.set(0,2.2,8),I.lookAt(0,1.2,0),P=new E({antialias:!0,alpha:!1,powerPreference:`high-performance`}),P.setSize(t,n),P.setPixelRatio(Math.min(window.devicePixelRatio,2)),P.setClearColor(J.sky,1),P.shadowMap.enabled=!0,P.shadowMap.type=2,P.toneMapping=4,P.toneMappingExposure=1.9,P.outputColorSpace=S,N.value.appendChild(P.domElement),F.background=new A(J.sky);let r=new p(7048811,2771498,.75);r.position.set(0,20,0),F.add(r);let i=new D(15266042,2);i.position.set(4,9,5),i.castShadow=!0,i.shadow.mapSize.width=2048,i.shadow.mapSize.height=2048,i.shadow.camera.near=.5,i.shadow.camera.far=25,i.shadow.camera.left=-12,i.shadow.camera.right=12,i.shadow.camera.top=12,i.shadow.camera.bottom=-12,i.shadow.radius=3,i.shadow.bias=-5e-4,i.shadow.normalBias=.02,F.add(i);let o=new l(15784112,3.5,18,Math.PI/8,.6,1.5);o.position.set(-3,6,2),o.target.position.set(0,0,-1),o.castShadow=!0,o.shadow.mapSize.width=1024,o.shadow.mapSize.height=1024,o.shadow.bias=-1e-4,o.shadow.radius=2,F.add(o),F.add(o.target);let c=new D(8191932,1);c.position.set(-5,2,-4),F.add(c);let d=new s(16441536,1.3,12,1.8);d.position.set(2,1.5,4),F.add(d);let h=new s(11063532,.9,15,2);h.position.set(0,3,-5),F.add(h),L=new b(P);let g=new O(F,I);L.addPass(g);let _=new T(new u(t,n),.35,.4,.85);L.addPass(_);let v=new m(k);v.uniforms.offset.value=1.3,v.uniforms.darkness.value=1.1,L.addPass(v);let x=X();F.add(x),F.add($()),F.add(ee()),[{x:-2.8,z:-1.2,s:1.3,t:`pine`},{x:-1,z:-3,s:1,t:`dark`},{x:2,z:-2.5,s:1.15,t:`pine`},{x:3.2,z:-.5,s:.75,t:`round`},{x:-.8,z:-3.8,s:1.4,t:`pine`},{x:1.2,z:-4,s:.85,t:`dark`},{x:-3.5,z:.8,s:.65,t:`round`},{x:3.8,z:1,s:1.05,t:`pine`},{x:0,z:-.8,s:1.6,t:`pine`},{x:-2,z:1.8,s:.8,t:`round`},{x:2.2,z:2,s:.9,t:`dark`},{x:-.5,z:2.5,s:.55,t:`round`}].forEach(e=>{let t=Y(e.x,e.z,e.s,e.t);z.push(t),F.add(t)}),B=Z(),F.add(B),V=Q(),F.add(V);let C=e=>{H=e.clientX/window.innerWidth*2-1,U=e.clientY/window.innerHeight*2-1};window.addEventListener(`mousemove`,C);let w=()=>{let e=N.value.closest(`[data-parallax-section]`);if(!e)return;let t=e.getBoundingClientRect(),n=window.innerHeight,r=t.height,i=(n-t.top)/(n+r);K=Math.max(0,Math.min(1,i))};window.addEventListener(`scroll`,w,{passive:!0});let j=()=>{if(!N.value)return;let e=N.value.clientWidth,t=N.value.clientHeight;I.aspect=e/t,I.updateProjectionMatrix(),P.setSize(e,t),L.setSize(e,t),_.resolution.set(e,t)};window.addEventListener(`resize`,j);let M=()=>{R=requestAnimationFrame(M);let t=(performance.now()-q)/1e3;W=H*.6+(K-.5)*1.8,G=2.2-U*.25+K*1.2,I.position.x+=(W-I.position.x)*.025,I.position.y+=(G-I.position.y)*.025,I.lookAt(0,1.1+K*.4,0),e||z.forEach(e=>{let n=e.userData,r=Math.sin(t*n.swaySpeed+n.phase)*n.swayAmount;e.rotation.z=r,e.rotation.x=Math.cos(t*n.swaySpeed*.7+n.phase)*n.swayAmount*.5}),B&&(B.material.uniforms.uTime.value=t),V&&(V.material.uniforms.uTime.value=t),o.intensity=2.5+Math.sin(t*.3)*.4,d.intensity=.8+Math.sin(t*.5+1)*.2,o.position.x=-3+Math.sin(t*.08)*1.5,o.position.z=2+Math.cos(t*.08)*1.5,L.render()};M(),P.userData={onResize:j,onMouseMove:C,onScroll:w}}),r(()=>{if(R&&cancelAnimationFrame(R),P){let{onResize:e,onMouseMove:t,onScroll:n}=P.userData||{};e&&window.removeEventListener(`resize`,e),t&&window.removeEventListener(`mousemove`,t),n&&window.removeEventListener(`scroll`,n),z.forEach(e=>{e.traverse(e=>{e.geometry&&e.geometry.dispose(),e.material&&(Array.isArray(e.material)?e.material.forEach(e=>e.dispose()):e.material.dispose())})}),B&&(B.geometry.dispose(),B.material.dispose()),V&&(V.geometry.dispose(),V.material.dispose()),L&&L.dispose(),P.dispose(),N.value&&P.domElement&&N.value.removeChild(P.domElement)}}),(e,r)=>(t(),n(`div`,{ref_key:`canvasContainer`,ref:N,class:`absolute inset-0 w-full h-full`,"aria-hidden":`true`},null,512))}};export{M as default};
