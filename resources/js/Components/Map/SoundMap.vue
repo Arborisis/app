@@ -160,7 +160,7 @@ const updateMarkers = () => {
     markerClusterGroup.value.clearLayers();
     markersMap.value.clear();
 
-    if (props.sounds.length === 0) return;
+    if (!Array.isArray(props.sounds) || props.sounds.length === 0) return;
 
     props.sounds.forEach((sound) => {
         const coords = sound.geometry.coordinates;
