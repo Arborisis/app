@@ -133,14 +133,6 @@ Route::get('/offline', [PageController::class, 'offline'])->name('offline');
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store')->middleware('throttle:5,1');
 
-Route::middleware(['auth', 'verified'])->prefix('helpdesk')->name('helpdesk.')->group(function () {
-    Route::get('/', [HelpdeskController::class, 'index'])->name('index');
-    Route::get('/create', [HelpdeskController::class, 'create'])->name('create');
-    Route::post('/', [HelpdeskController::class, 'store'])->name('store');
-    Route::get('/{ticketNumber}', [HelpdeskController::class, 'show'])->name('show');
-    Route::post('/{ticketNumber}/reply', [HelpdeskController::class, 'reply'])->name('reply');
-});
-
 Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])
     ->name('newsletter.subscribe')
     ->middleware('throttle:3,1');

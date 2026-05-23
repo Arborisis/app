@@ -4,7 +4,6 @@ import './echo';
 import { registerServiceWorker } from './pwa';
 
 import { createInertiaApp } from '@inertiajs/vue3';
-import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createApp, h } from 'vue';
 import { createPinia } from 'pinia';
 import { ZiggyVue } from 'ziggy-js';
@@ -105,13 +104,19 @@ if (typeof window !== 'undefined') {
     registerWebMcpTools();
 }
 
+// Pre-load all page components eagerly to avoid dynamic import 503 errors
+// via Cloudflare rate-limiting on lazy chunks
+const pages = import.meta.glob('./Pages/**/*.vue', { eager: true });
+
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
-    resolve: (name) =>
-        resolvePageComponent(
-            `./Pages/${name}.vue`,
-            import.meta.glob('./Pages/**/*.vue'),
-        ),
+    resolve: (name) => {
+        const page = pages[`./Pages/${name}.vue`];
+        if (!page) {
+            throw new Error(`Page not found: ./Pages/${name}.vue`);
+        }
+        return page.default;
+    },
     setup({ el, App, props, plugin }) {
         const app = createApp({
             render: () => h('div', { class: 'relative' }, [

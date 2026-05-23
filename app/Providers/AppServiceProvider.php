@@ -89,7 +89,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Vite::prefetch(concurrency: 3);
+        if ($this->app->environment('production')) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
+
+        // Désactiver le prefetch pour éviter le rate-limiting Cloudflare
+        // Vite::prefetch(concurrency: 3);
 
         User::observe(UserObserver::class);
         SoundFile::observe(SoundFileObserver::class);
