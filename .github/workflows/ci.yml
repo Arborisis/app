@@ -232,9 +232,6 @@ jobs:
     name: Docker build verification
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    # FIXME: No Dockerfile exists in this repository.
-    # The Dockerfile is located in the infrastructure repository.
-    if: false
 
     steps:
       - name: Checkout

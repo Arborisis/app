@@ -1,7 +1,12 @@
 FROM php:8.4-cli
 
 RUN apt-get update && apt-get install -y \
-    git curl libpng-dev libonig-dev libxml2-dev libzip-dev libpq-dev libicu-dev zip unzip nodejs npm \
+    git curl libpng-dev libonig-dev libxml2-dev libzip-dev libpq-dev libicu-dev zip unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js 22 (LTS) — apt nodejs is too old
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 RUN docker-php-ext-install pdo pdo_pgsql mbstring exif pcntl bcmath gd zip opcache intl \
