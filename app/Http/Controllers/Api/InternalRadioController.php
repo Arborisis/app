@@ -42,7 +42,11 @@ class InternalRadioController extends Controller
     public function playlistM3u(): Response
     {
         $liqContent = $this->playlistExport->liq();
-        $liqPath = storage_path('app/radio-cache/playlist.liq');
+        $cacheDir = storage_path('app/radio-cache');
+        if (!is_dir($cacheDir)) {
+            mkdir($cacheDir, 0755, true);
+        }
+        $liqPath = $cacheDir . '/playlist.liq';
         file_put_contents($liqPath, $liqContent, LOCK_EX);
 
         return response($this->playlistExport->m3u(), 200, [

@@ -150,7 +150,11 @@ class RadioRebuildCacheCommand extends Command
     private function regeneratePlaylistFile(): void
     {
         $export = app(RadioPlaylistExportService::class);
-        $liqPath = storage_path('app/radio-cache/playlist.liq');
+        $cacheDir = storage_path('app/radio-cache');
+        if (!is_dir($cacheDir)) {
+            mkdir($cacheDir, 0755, true);
+        }
+        $liqPath = $cacheDir . '/playlist.liq';
         file_put_contents($liqPath, $export->liq(), LOCK_EX);
         $this->info("Playlist file regenerated: {$liqPath}");
     }
