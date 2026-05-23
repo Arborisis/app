@@ -58,10 +58,10 @@ class RequestAudioAnalysis implements ShouldQueue
         }
 
         $urls = $this->getAnalyzerUrls();
-        $analyzerToken = config('services.analyzer.internal_api_token');
+        $analyzerSecret = config('services.analyzer.secret');
 
-        if (empty($urls) || empty($analyzerToken)) {
-            Log::error('RequestAudioAnalysis: analyzer URLs or token not configured.');
+        if (empty($urls) || empty($analyzerSecret)) {
+            Log::error('RequestAudioAnalysis: analyzer URLs or secret not configured.');
 
             return;
         }
@@ -72,7 +72,7 @@ class RequestAudioAnalysis implements ShouldQueue
         foreach ($shuffled as $analyzerUrl) {
             try {
                 $response = Http::withHeaders([
-                    'Authorization' => 'Bearer '.$analyzerToken,
+                    'Authorization' => 'Bearer '.$analyzerSecret,
                     'Content-Type' => 'application/json',
                 ])
                     ->connectTimeout(5)
