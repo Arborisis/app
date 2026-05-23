@@ -71,8 +71,8 @@ class DashboardService
         return Cache::remember("dashboard:activities:{$user->id}", self::CACHE_TTL_ACTIVITIES, function () use ($user): array {
             // Optimized query: get likes directly with sound info, not through sounds
             $recentLikes = Like::query()
-                ->with(['user:id,name', 'likeable:id,title'])
-                ->whereHas('likeable', fn ($q) => $q->where('user_id', $user->id))
+                ->with(['user:id,name', 'sound:id,title'])
+                ->whereHas('sound', fn ($q) => $q->where('user_id', $user->id))
                 ->where('created_at', '>=', now()->subDays(30))
                 ->latest()
                 ->limit(20)
@@ -81,13 +81,13 @@ class DashboardService
                     'id' => 'like-'.$like->id,
                     'type' => 'like',
                     'user' => $like->user ? ['name' => $like->user->name] : null,
-                    'description' => $like->likeable ? "a aimé \"{$like->likeable->title}\"" : 'a aimé un son',
+                    'description' => $like->sound ? "a aimé \"{$like->sound->title}\"" : 'a aimé un son',
                     'created_at' => $like->created_at->toISOString(),
                 ]);
 
             $recentComments = Comment::query()
-                ->with(['user:id,name', 'commentable:id,title'])
-                ->whereHas('commentable', fn ($q) => $q->where('user_id', $user->id))
+                ->with(['user:id,name', 'sound:id,title'])
+                ->whereHas('sound', fn ($q) => $q->where('user_id', $user->id))
                 ->where('created_at', '>=', now()->subDays(30))
                 ->latest()
                 ->limit(20)
@@ -96,7 +96,7 @@ class DashboardService
                     'id' => 'comment-'.$comment->id,
                     'type' => 'comment',
                     'user' => $comment->user ? ['name' => $comment->user->name] : null,
-                    'description' => $comment->commentable ? "a commenté \"{$comment->commentable->title}\"" : 'a commenté un son',
+                    'description' => $comment->sound ? "a commenté \"{$comment->sound->title}\"" : 'a commenté un son',
                     'created_at' => $comment->created_at->toISOString(),
                 ]);
 
