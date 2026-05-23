@@ -12,7 +12,5 @@ class ArborisisPointSubmitted
 {
     use Dispatchable, SerializesModels;
 
-    public function __construct(public ArborisisPoint $point)
-    {
-    }
+    public function __construct(public ArborisisPoint $point) {}
 }

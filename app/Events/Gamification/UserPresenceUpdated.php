@@ -15,9 +15,7 @@ class UserPresenceUpdated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public function __construct(public UserPresence $presence)
-    {
-    }
+    public function __construct(public UserPresence $presence) {}
 
     public function broadcastOn(): array
     {

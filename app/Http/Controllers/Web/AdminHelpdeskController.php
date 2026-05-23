@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use App\Models\HelpdeskIaSuggestion;
 use App\Models\HelpdeskTicket;
 use App\Services\HelpdeskService;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -16,8 +15,7 @@ class AdminHelpdeskController extends Controller
 {
     public function __construct(
         private readonly HelpdeskService $helpdeskService,
-    ) {
-    }
+    ) {}
 
     public function index(): Response
     {

@@ -14,8 +14,7 @@ class PresenceController extends Controller
 {
     public function __construct(
         private readonly PresenceService $presenceService,
-    ) {
-    }
+    ) {}
 
     public function update(Request $request): JsonResponse
     {

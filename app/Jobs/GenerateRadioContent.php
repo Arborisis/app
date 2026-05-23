@@ -19,6 +19,7 @@ class GenerateRadioContent implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $timeout = 600;
+
     public int $tries = 1;
 
     public function __construct(public readonly RadioShowType $showType)
@@ -32,8 +33,8 @@ class GenerateRadioContent implements ShouldQueue
         RadioEmissionGenerationService $emission,
     ): void {
         match ($this->showType) {
-            RadioShowType::Podcast  => $podcast->generate(),
-            RadioShowType::Flash    => $flash->generate(),
+            RadioShowType::Podcast => $podcast->generate(),
+            RadioShowType::Flash => $flash->generate(),
             RadioShowType::Emission => $emission->generate(),
         };
     }

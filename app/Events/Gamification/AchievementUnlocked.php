@@ -12,7 +12,5 @@ class AchievementUnlocked
 {
     use Dispatchable, SerializesModels;
 
-    public function __construct(public UserAchievement $userAchievement)
-    {
-    }
+    public function __construct(public UserAchievement $userAchievement) {}
 }

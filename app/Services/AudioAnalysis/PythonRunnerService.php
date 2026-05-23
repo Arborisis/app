@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace App\Services\AudioAnalysis;
 
-use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
 
 class PythonRunnerService
 {
     private string $pythonPath;
+
     private string $basePath;
+
     private int $timeout;
 
     public function __construct()
@@ -55,7 +57,6 @@ class PythonRunnerService
     /**
      * Exécute le pipeline CLI et retourne le JSON parsé.
      *
-     * @return array
      *
      * @throws \RuntimeException
      */
@@ -100,6 +101,7 @@ class PythonRunnerService
     {
         try {
             $this->validateEnvironment();
+
             return true;
         } catch (\Throwable) {
             return false;

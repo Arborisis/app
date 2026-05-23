@@ -6,7 +6,6 @@ namespace App\Notifications;
 
 use Illuminate\Auth\Notifications\ResetPassword as BaseResetPassword;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Support\Facades\Lang;
 
 class ResetPasswordNotification extends BaseResetPassword
 {
@@ -20,7 +19,7 @@ class ResetPasswordNotification extends BaseResetPassword
         }
 
         $resetUrl = $this->resetUrl($notifiable);
-        $expires = config('auth.passwords.' . config('auth.defaults.passwords') . '.expire', 60);
+        $expires = config('auth.passwords.'.config('auth.defaults.passwords').'.expire', 60);
 
         return (new MailMessage)
             ->subject('Réinitialisez votre mot de passe — Arborisis')

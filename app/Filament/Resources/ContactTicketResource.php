@@ -13,7 +13,6 @@ use App\Enums\UserRole;
 use App\Filament\Resources\ContactTicketResource\Pages;
 use App\Models\ContactTicket;
 use App\Models\User;
-use App\Services\Helpdesk\HelpdeskService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -26,9 +25,13 @@ use Illuminate\Support\HtmlString;
 class ContactTicketResource extends Resource
 {
     protected static ?string $model = ContactTicket::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-envelope';
+
     protected static ?string $navigationLabel = 'Tickets de contact';
+
     protected static ?string $modelLabel = 'Ticket';
+
     protected static ?string $pluralModelLabel = 'Tickets';
 
     public static function form(Form $form): Form

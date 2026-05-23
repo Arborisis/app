@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Cache;
 class MapController extends Controller
 {
     private const MAX_SOUNDS = 500;
+
     private const CACHE_TTL = 300; // 5 minutes
 
     public function sounds(Request $request): JsonResponse

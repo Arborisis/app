@@ -1,6 +1,10 @@
 <?php
 
+use App\Http\Middleware\AddAgentDiscoveryLinks;
+use App\Http\Middleware\EnsureCanAccessRadioManager;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\PerformanceHeaders;
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -16,17 +20,17 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
-        
+
         $middleware->web(append: [
-            \App\Http\Middleware\SecurityHeaders::class,
-            \App\Http\Middleware\PerformanceHeaders::class,
+            SecurityHeaders::class,
+            PerformanceHeaders::class,
             HandleInertiaRequests::class,
-            \App\Http\Middleware\AddAgentDiscoveryLinks::class,
+            AddAgentDiscoveryLinks::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
 
         $middleware->alias([
-            'canAccessRadioManager' => \App\Http\Middleware\EnsureCanAccessRadioManager::class,
+            'canAccessRadioManager' => EnsureCanAccessRadioManager::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -5,15 +5,18 @@ declare(strict_types=1);
 namespace App\Services\Blog;
 
 use App\Models\BlogPost;
+use App\Models\Category;
 use App\Models\Sound;
 use App\Models\User;
 use App\Services\AI\OpenRouterService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class AiBlogGeneratorService
 {
     private const DEFAULT_MODEL = 'anthropic/claude-opus-4.7';
+
     private const BASE_URL = 'https://openrouter.ai/api/v1';
 
     /**
@@ -305,7 +308,7 @@ PROMPT;
 
         $totalSounds = Sound::count();
 
-        $topCategories = \App\Models\Category::withCount('sounds')
+        $topCategories = Category::withCount('sounds')
             ->orderByDesc('sounds_count')
             ->limit(5)
             ->get()
@@ -353,7 +356,7 @@ PROMPT;
         ];
     }
 
-    private function seasonLabel(\Carbon\Carbon $date): string
+    private function seasonLabel(Carbon $date): string
     {
         $month = (int) $date->format('n');
 

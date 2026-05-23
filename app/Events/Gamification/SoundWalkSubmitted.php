@@ -15,6 +15,5 @@ class SoundWalkSubmitted
 
     public function __construct(
         public readonly SoundWalk $soundWalk,
-    ) {
-    }
+    ) {}
 }

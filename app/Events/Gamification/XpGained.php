@@ -12,7 +12,5 @@ class XpGained
 {
     use Dispatchable, SerializesModels;
 
-    public function __construct(public XpEvent $xpEvent)
-    {
-    }
+    public function __construct(public XpEvent $xpEvent) {}
 }

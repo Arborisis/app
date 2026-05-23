@@ -86,6 +86,7 @@ class PresenceService
     {
         // Rough approximation: 1 degree ≈ 111km
         $degrees = $meters / 111000;
+
         return round($coordinate / $degrees) * $degrees;
     }
 }

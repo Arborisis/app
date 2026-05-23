@@ -16,6 +16,5 @@ class ArborisisPointApproved
     public function __construct(
         public ArborisisPoint $point,
         public User $admin,
-    ) {
-    }
+    ) {}
 }

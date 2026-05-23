@@ -16,8 +16,7 @@ class AgentActionController extends Controller
     public function __construct(
         private readonly ArborisisPointService $pointService,
         private readonly SoundWalkService $soundWalkService,
-    ) {
-    }
+    ) {}
 
     public function createPoint(CreatePointRequest $request): JsonResponse
     {

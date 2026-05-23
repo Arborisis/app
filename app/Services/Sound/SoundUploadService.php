@@ -4,21 +4,26 @@ declare(strict_types=1);
 
 namespace App\Services\Sound;
 
+use App\Enums\AnalysisStatus;
+use App\Enums\NatureSensitivityLevel;
+use App\Enums\Season;
 use App\Enums\SoundStatus;
+use App\Enums\TimeOfDay;
 use App\Events\SoundPublished;
 use App\Jobs\ProcessAudioAnalysis;
 use App\Jobs\RequestAudioAnalysis;
 use App\Models\Category;
 use App\Models\Environment;
+use App\Models\EnvironmentalObservation;
+use App\Models\ListeningPoint;
 use App\Models\Sound;
-use App\Services\Audio\AudioDurationService;
-use App\Services\Discord\DiscordNotificationService;
-use App\Services\Scientific\ListeningPointService;
-use App\Enums\Season;
-use App\Enums\TimeOfDay;
+use App\Models\SoundAnalysis;
 use App\Models\SoundFile;
 use App\Models\SoundLocation;
 use App\Models\Tag;
+use App\Services\Audio\AudioDurationService;
+use App\Services\Discord\DiscordNotificationService;
+use App\Services\Scientific\ListeningPointService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -127,7 +132,7 @@ class SoundUploadService
 
                 // 4b. Environmental observation
                 if (! empty($data['weather_notes']) || ! empty($data['perceived_activity_level'])) {
-                    \App\Models\EnvironmentalObservation::create([
+                    EnvironmentalObservation::create([
                         'sound_id' => $sound->id,
                         'listening_point_id' => $sound->listening_point_id,
                         'season' => $sound->recorded_at ? Season::fromDate($sound->recorded_at)->value : null,
@@ -159,9 +164,9 @@ class SoundUploadService
                 if ($analysisOnUpload) {
                     if ($disk === 'r2') {
                         // New pipeline: R2 Event → Queue → Worker → Analyzer
-                        \App\Models\SoundAnalysis::firstOrCreate(
+                        SoundAnalysis::firstOrCreate(
                             ['sound_id' => $sound->id],
-                            ['status' => \App\Enums\AnalysisStatus::PENDING, 'original_r2_key' => $path]
+                            ['status' => AnalysisStatus::PENDING, 'original_r2_key' => $path]
                         );
 
                         // Fallback: dispatch directly to analyzer workers
@@ -281,9 +286,10 @@ class SoundUploadService
     {
         // Cas 1 : l'utilisateur a explicitement choisi un point existant
         if (! empty($data['listening_point_id']) && empty($data['create_new_listening_point'])) {
-            $point = \App\Models\ListeningPoint::find($data['listening_point_id']);
+            $point = ListeningPoint::find($data['listening_point_id']);
             if ($point && $point->isApproved()) {
                 $this->listeningPointService->attachSoundToPoint($sound, $point);
+
                 return;
             }
         }
@@ -293,9 +299,10 @@ class SoundUploadService
             $point = $this->listeningPointService->createFromSound($sound, [
                 'title' => $data['listening_point_title'] ?? ($data['location_name'] ?? null),
                 'nature_sensitivity_level' => $data['is_sensitive_location']
-                    ? \App\Enums\NatureSensitivityLevel::Fragile
-                    : \App\Enums\NatureSensitivityLevel::Normal,
+                    ? NatureSensitivityLevel::Fragile
+                    : NatureSensitivityLevel::Normal,
             ]);
+
             return;
         }
 
@@ -310,8 +317,8 @@ class SoundUploadService
             $this->listeningPointService->createFromSound($sound, [
                 'title' => $data['location_name'] ?? null,
                 'nature_sensitivity_level' => $data['is_sensitive_location']
-                    ? \App\Enums\NatureSensitivityLevel::Fragile
-                    : \App\Enums\NatureSensitivityLevel::Normal,
+                    ? NatureSensitivityLevel::Fragile
+                    : NatureSensitivityLevel::Normal,
             ]);
         }
     }

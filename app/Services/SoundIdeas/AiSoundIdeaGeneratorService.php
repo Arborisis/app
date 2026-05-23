@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\DailySoundIdea;
 use App\Models\Sound;
 use App\Services\AI\OpenRouterService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class AiSoundIdeaGeneratorService
@@ -154,7 +155,7 @@ class AiSoundIdeaGeneratorService
         ];
     }
 
-    private function seasonLabel(\Carbon\Carbon $date): string
+    private function seasonLabel(Carbon $date): string
     {
         $month = (int) $date->format('n');
 

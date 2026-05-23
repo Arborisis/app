@@ -10,6 +10,7 @@ class CircuitBreaker
 {
     /**
      * @template T
+     *
      * @param  callable(): T  $action
      * @param  callable(): T|T|null  $fallback
      * @return T|null

@@ -2,37 +2,47 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AgentDiscoveryController;
+use App\Http\Controllers\Api\PushSubscriptionController;
+use App\Http\Controllers\Auth\DiscordController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StripeWebhookController;
-use App\Http\Controllers\Web\CommentController;
-use App\Http\Controllers\Web\CreatorController;
-use App\Http\Controllers\Web\CreatorProfileController;
-use App\Http\Controllers\Web\DashboardController;
-use App\Http\Controllers\Web\EchoDonationController;
-use App\Http\Controllers\Web\FollowController;
-use App\Http\Controllers\Web\LandingController;
-use App\Http\Controllers\Web\LikeController;
-use App\Http\Controllers\Web\MapController;
-use App\Http\Controllers\Web\PageController;
-use App\Http\Controllers\Web\RadioManagerController;
-use Inertia\Inertia;
-use App\Http\Controllers\Web\RadioController;
-use App\Http\Controllers\Web\ReportController;
+use App\Http\Controllers\Web\AdminHelpdeskController;
 use App\Http\Controllers\Web\AudioAnalysisController;
+use App\Http\Controllers\Web\BlogController;
 use App\Http\Controllers\Web\ChatConversationController;
 use App\Http\Controllers\Web\ChatMessageController;
 use App\Http\Controllers\Web\ChatModerationController;
 use App\Http\Controllers\Web\ChatPrivateMessageController;
 use App\Http\Controllers\Web\ChatRoomController;
-use App\Http\Controllers\Web\BlogController;
-use App\Http\Controllers\Web\SoundController;
-use App\Http\Controllers\Web\WalletController;
-use App\Http\Controllers\Web\AdminHelpdeskController;
+use App\Http\Controllers\Web\CommentController;
+use App\Http\Controllers\Web\ContactController;
+use App\Http\Controllers\Web\CreatorController;
+use App\Http\Controllers\Web\CreatorProfileController;
+use App\Http\Controllers\Web\DashboardController;
+use App\Http\Controllers\Web\EchoDonationController;
+use App\Http\Controllers\Web\FollowController;
 use App\Http\Controllers\Web\HelpdeskController;
+use App\Http\Controllers\Web\LandingController;
+use App\Http\Controllers\Web\LikeController;
+use App\Http\Controllers\Web\ListeningPointController;
+use App\Http\Controllers\Web\MapController;
+use App\Http\Controllers\Web\NewsletterController;
+use App\Http\Controllers\Web\PageController;
+use App\Http\Controllers\Web\RadioController;
+use App\Http\Controllers\Web\RadioManagerController;
+use App\Http\Controllers\Web\ReportController;
+use App\Http\Controllers\Web\ScientificStatsController;
+use App\Http\Controllers\Web\SocialListController;
+use App\Http\Controllers\Web\SoundController;
+use App\Http\Controllers\Web\SoundWalkController;
+use App\Http\Controllers\Web\WalletController;
 use App\Http\Controllers\Web\XenoCantoSubmissionController;
+use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 
@@ -89,8 +99,8 @@ Route::middleware(['auth', 'verified'])->get('/arborisis-map', function () {
     return Inertia::render('ArborisisMap/Index');
 })->name('arborisis-map.index');
 
-Route::get('/sound-walks', [\App\Http\Controllers\Web\SoundWalkController::class, 'index'])->name('sound-walks.index');
-Route::get('/sound-walks/{slug}', [\App\Http\Controllers\Web\SoundWalkController::class, 'show'])->name('sound-walks.show');
+Route::get('/sound-walks', [SoundWalkController::class, 'index'])->name('sound-walks.index');
+Route::get('/sound-walks/{slug}', [SoundWalkController::class, 'show'])->name('sound-walks.show');
 
 Route::get('/creators', [CreatorController::class, 'index'])->name('creators.index');
 Route::get('/creators/{slug}', [CreatorProfileController::class, 'show'])->name('creators.show');
@@ -98,19 +108,19 @@ Route::get('/creators/{slug}', [CreatorProfileController::class, 'show'])->name(
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
-Route::get('/users/{user:slug}/followers', [\App\Http\Controllers\Web\SocialListController::class, 'followers'])->name('users.followers');
-Route::get('/users/{user:slug}/following', [\App\Http\Controllers\Web\SocialListController::class, 'following'])->name('users.following');
-Route::get('/users/{user:slug}/friends', [\App\Http\Controllers\Web\SocialListController::class, 'friends'])->name('users.friends');
+Route::get('/users/{user:slug}/followers', [SocialListController::class, 'followers'])->name('users.followers');
+Route::get('/users/{user:slug}/following', [SocialListController::class, 'following'])->name('users.following');
+Route::get('/users/{user:slug}/friends', [SocialListController::class, 'friends'])->name('users.friends');
 
 Route::middleware(['throttle:scientific-api'])->group(function () {
-    Route::get('/scientific-stats', [\App\Http\Controllers\Web\ScientificStatsController::class, 'index'])->name('scientific-stats.index');
+    Route::get('/scientific-stats', [ScientificStatsController::class, 'index'])->name('scientific-stats.index');
 });
 
 Route::middleware(['throttle:listening-points'])->group(function () {
-    Route::get('/listening-points', [\App\Http\Controllers\Web\ListeningPointController::class, 'index'])->name('listening-points.index');
-    Route::get('/listening-points/{slug}', [\App\Http\Controllers\Web\ListeningPointController::class, 'show'])->name('listening-points.show');
-    Route::get('/api/listening-points/heatmap', [\App\Http\Controllers\Web\ListeningPointController::class, 'heatmap'])->name('listening-points.heatmap');
-    Route::get('/api/listening-points/timeline', [\App\Http\Controllers\Web\ListeningPointController::class, 'timeline'])->name('listening-points.timeline');
+    Route::get('/listening-points', [ListeningPointController::class, 'index'])->name('listening-points.index');
+    Route::get('/listening-points/{slug}', [ListeningPointController::class, 'show'])->name('listening-points.show');
+    Route::get('/api/listening-points/heatmap', [ListeningPointController::class, 'heatmap'])->name('listening-points.heatmap');
+    Route::get('/api/listening-points/timeline', [ListeningPointController::class, 'timeline'])->name('listening-points.timeline');
 });
 
 Route::get('/transparency', [PageController::class, 'transparency'])->name('transparency');
@@ -120,25 +130,25 @@ Route::get('/charte', [PageController::class, 'charte'])->name('charte');
 Route::get('/privacy', [PageController::class, 'privacy'])->name('privacy');
 Route::get('/offline', [PageController::class, 'offline'])->name('offline');
 
-Route::get('/contact', [\App\Http\Controllers\Web\ContactController::class, 'index'])->name('contact');
-Route::post('/contact', [\App\Http\Controllers\Web\ContactController::class, 'store'])->name('contact.store')->middleware('throttle:5,1');
+Route::get('/contact', [ContactController::class, 'index'])->name('contact');
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store')->middleware('throttle:5,1');
 
 Route::middleware(['auth', 'verified'])->prefix('helpdesk')->name('helpdesk.')->group(function () {
-    Route::get('/', [\App\Http\Controllers\Web\HelpdeskController::class, 'index'])->name('index');
-    Route::get('/create', [\App\Http\Controllers\Web\HelpdeskController::class, 'create'])->name('create');
-    Route::post('/', [\App\Http\Controllers\Web\HelpdeskController::class, 'store'])->name('store');
-    Route::get('/{ticketNumber}', [\App\Http\Controllers\Web\HelpdeskController::class, 'show'])->name('show');
-    Route::post('/{ticketNumber}/reply', [\App\Http\Controllers\Web\HelpdeskController::class, 'reply'])->name('reply');
+    Route::get('/', [HelpdeskController::class, 'index'])->name('index');
+    Route::get('/create', [HelpdeskController::class, 'create'])->name('create');
+    Route::post('/', [HelpdeskController::class, 'store'])->name('store');
+    Route::get('/{ticketNumber}', [HelpdeskController::class, 'show'])->name('show');
+    Route::post('/{ticketNumber}/reply', [HelpdeskController::class, 'reply'])->name('reply');
 });
 
-Route::post('/newsletter/subscribe', [\App\Http\Controllers\Web\NewsletterController::class, 'subscribe'])
+Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])
     ->name('newsletter.subscribe')
     ->middleware('throttle:3,1');
-Route::get('/newsletter/unsubscribe/{token}', [\App\Http\Controllers\Web\NewsletterController::class, 'unsubscribe'])
+Route::get('/newsletter/unsubscribe/{token}', [NewsletterController::class, 'unsubscribe'])
     ->name('newsletter.unsubscribe');
 
-Route::post('/api/push-subscriptions', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'store'])->middleware('throttle:10,1');
-Route::delete('/api/push-subscriptions', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'destroy'])->middleware('throttle:10,1');
+Route::post('/api/push-subscriptions', [PushSubscriptionController::class, 'store'])->middleware('throttle:10,1');
+Route::delete('/api/push-subscriptions', [PushSubscriptionController::class, 'destroy'])->middleware('throttle:10,1');
 Route::get('/api/vapid-public-key', fn () => ['key' => config('services.vapid.public_key')]);
 
 Route::get('/radio', [RadioController::class, 'index'])->name('radio.index');
@@ -147,8 +157,8 @@ Route::get('/radio/programmes', [RadioController::class, 'shows'])->name('radio.
 Route::get('/radio/stream', [RadioController::class, 'stream'])
     ->name('radio.stream')
     ->withoutMiddleware([
-        \App\Http\Middleware\HandleInertiaRequests::class,
-        \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
+        HandleInertiaRequests::class,
+        AddLinkHeadersForPreloadedAssets::class,
     ]);
 Route::get('/radio/stream.m3u', [RadioController::class, 'playlist'])->name('radio.playlist');
 Route::get('/radio/cache/{type}/{id}', [RadioController::class, 'serveCachedAudio'])
@@ -185,11 +195,11 @@ Route::middleware(['auth', 'verified'])
             ->middleware('canAccessRadioManager');
     });
 
-Route::get('/auth/discord/callback', [\App\Http\Controllers\Auth\DiscordController::class, 'callback'])->name('discord.callback');
+Route::get('/auth/discord/callback', [DiscordController::class, 'callback'])->name('discord.callback');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/auth/discord/redirect', [\App\Http\Controllers\Auth\DiscordController::class, 'redirect'])->name('discord.redirect');
-    Route::post('/auth/discord/unlink', [\App\Http\Controllers\Auth\DiscordController::class, 'unlink'])->name('discord.unlink');
+    Route::get('/auth/discord/redirect', [DiscordController::class, 'redirect'])->name('discord.redirect');
+    Route::post('/auth/discord/unlink', [DiscordController::class, 'unlink'])->name('discord.unlink');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {

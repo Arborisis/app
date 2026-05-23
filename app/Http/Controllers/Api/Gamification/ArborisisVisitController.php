@@ -22,8 +22,7 @@ class ArborisisVisitController extends Controller
     public function __construct(
         private readonly GeoValidationService $geoService,
         private readonly AntiCheatService $antiCheatService,
-    ) {
-    }
+    ) {}
 
     public function visit(Request $request, ArborisisPoint $arborisisPoint): JsonResponse
     {
@@ -87,7 +86,7 @@ class ArborisisVisitController extends Controller
                 'status' => $status,
                 'validation_reason' => $validationReason,
                 'anti_cheat_score' => $validation['score'],
-                'anti_cheat_notes' => !empty($validation['issues']) ? implode(', ', $validation['issues']) : null,
+                'anti_cheat_notes' => ! empty($validation['issues']) ? implode(', ', $validation['issues']) : null,
             ]);
 
             if ($status === VisitStatus::Valid) {
@@ -125,7 +124,7 @@ class ArborisisVisitController extends Controller
         }
 
         return response()->json([
-            'message' => 'Visite invalide : ' . $validationReason->label(),
+            'message' => 'Visite invalide : '.$validationReason->label(),
             'reason' => $validationReason->value,
             'distance' => round($validation['distance'], 1),
             'max_radius' => config('gamification.check_in_radius', 100),

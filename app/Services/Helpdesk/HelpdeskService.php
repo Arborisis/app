@@ -13,8 +13,6 @@ use App\Mail\ContactTicketSubmitted;
 use App\Models\ContactTicket;
 use App\Models\ContactTicketReply;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 

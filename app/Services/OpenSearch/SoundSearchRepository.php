@@ -6,6 +6,7 @@ namespace App\Services\OpenSearch;
 
 use App\Models\Sound;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 
 class SoundSearchRepository
 {
@@ -134,7 +135,7 @@ class SoundSearchRepository
             $total,
             $perPage,
             $page,
-            ['path' => \Illuminate\Pagination\Paginator::resolveCurrentPath()]
+            ['path' => Paginator::resolveCurrentPath()]
         );
     }
 

@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Enums\LicenseType;
 use App\Enums\SoundStatus;
 use App\Enums\SoundVisibility;
+use App\Services\Storage\SignedUrlService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -163,7 +164,7 @@ class Sound extends Model
     private function getStorageUrl(string $disk, string $path): string
     {
         if ($disk === 'r2') {
-            return app(\App\Services\Storage\SignedUrlService::class)->url($disk, $path);
+            return app(SignedUrlService::class)->url($disk, $path);
         }
 
         if ($disk === 'audio' || $disk === 's3') {

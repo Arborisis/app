@@ -14,7 +14,7 @@ beforeEach(function () {
 });
 
 it('opens after the configured number of failures and returns fallback', function () {
-    $breaker = new CircuitBreaker();
+    $breaker = new CircuitBreaker;
 
     expect(fn () => $breaker->attempt('test', fn () => throw new RuntimeException('one')))->toThrow(RuntimeException::class);
     expect(fn () => $breaker->attempt('test', fn () => throw new RuntimeException('two')))->toThrow(RuntimeException::class);
@@ -24,7 +24,7 @@ it('opens after the configured number of failures and returns fallback', functio
 });
 
 it('clears failures after a successful attempt', function () {
-    $breaker = new CircuitBreaker();
+    $breaker = new CircuitBreaker;
 
     expect(fn () => $breaker->attempt('test', fn () => throw new RuntimeException('one')))->toThrow(RuntimeException::class);
     expect($breaker->state('test'))->toBe('half_open');

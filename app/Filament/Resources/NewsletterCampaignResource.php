@@ -7,6 +7,7 @@ namespace App\Filament\Resources;
 use App\Enums\NewsletterCampaignStatus;
 use App\Filament\Resources\NewsletterCampaignResource\Pages;
 use App\Models\NewsletterCampaign;
+use App\Services\Newsletter\NewsletterMailService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
@@ -18,11 +19,17 @@ use Illuminate\Support\HtmlString;
 class NewsletterCampaignResource extends Resource
 {
     protected static ?string $model = NewsletterCampaign::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-envelope-open';
+
     protected static ?string $navigationLabel = 'Campagnes newsletter';
+
     protected static ?string $modelLabel = 'Campagne';
+
     protected static ?string $pluralModelLabel = 'Campagnes';
+
     protected static ?string $navigationGroup = 'Communication';
+
     protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
@@ -115,8 +122,8 @@ class NewsletterCampaignResource extends Resource
                     ->modalHeading('Aperçu de la campagne')
                     ->modalContent(fn (NewsletterCampaign $record): HtmlString => new HtmlString(
                         '<div style="background:#0B1220;padding:24px;border-radius:12px;max-height:500px;overflow:auto;">'
-                        . $record->content_html
-                        . '</div>'
+                        .$record->content_html
+                        .'</div>'
                     ))
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel('Fermer'),
@@ -126,13 +133,12 @@ class NewsletterCampaignResource extends Resource
                     ->color('success')
                     ->requiresConfirmation()
                     ->modalHeading('Confirmer l\'envoi')
-                    ->modalDescription(fn (NewsletterCampaign $record): string =>
-                        "Envoyer \"{$record->subject}\" à tous les abonnés actifs ?"
+                    ->modalDescription(fn (NewsletterCampaign $record): string => "Envoyer \"{$record->subject}\" à tous les abonnés actifs ?"
                     )
                     ->modalSubmitActionLabel('Envoyer')
                     ->visible(fn (NewsletterCampaign $record): bool => $record->isDraft())
                     ->action(function (NewsletterCampaign $record) {
-                        $service = app(\App\Services\Newsletter\NewsletterMailService::class);
+                        $service = app(NewsletterMailService::class);
                         $service->sendCampaign($record);
 
                         Notification::make()

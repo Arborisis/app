@@ -122,12 +122,12 @@ class ElevenLabsService
         $mergedSettings = $this->normalizeVoiceSettings($mergedSettings);
 
         $response = $this->postWithBreaker($this->url("/text-to-speech/{$voiceId}/stream", [
-                'output_format' => config('services.elevenlabs.output_format', 'mp3_44100_192'),
-            ]), [
-                'text' => $text,
-                'model_id' => $modelId ?? (string) config('services.elevenlabs.model', self::DEFAULT_TTS_MODEL),
-                'voice_settings' => $mergedSettings,
-            ], (int) config('services.elevenlabs.timeout', 120));
+            'output_format' => config('services.elevenlabs.output_format', 'mp3_44100_192'),
+        ]), [
+            'text' => $text,
+            'model_id' => $modelId ?? (string) config('services.elevenlabs.model', self::DEFAULT_TTS_MODEL),
+            'voice_settings' => $mergedSettings,
+        ], (int) config('services.elevenlabs.timeout', 120));
 
         if ($response === null) {
             return null;
@@ -184,14 +184,14 @@ class ElevenLabsService
         $durationSeconds = max(0.5, min(30.0, $durationSeconds));
 
         $response = $this->postWithBreaker($this->url('/sound-generation', [
-                'output_format' => config('services.elevenlabs.sound_output_format', 'mp3_44100_192'),
-            ]), [
-                'text' => $prompt,
-                'duration_seconds' => $durationSeconds,
-                'loop' => $loop,
-                'prompt_influence' => (float) config('services.elevenlabs.sound_prompt_influence', 0.45),
-                'model_id' => config('services.elevenlabs.sound_model', self::DEFAULT_SOUND_MODEL),
-            ], (int) config('services.elevenlabs.sound_timeout', 120));
+            'output_format' => config('services.elevenlabs.sound_output_format', 'mp3_44100_192'),
+        ]), [
+            'text' => $prompt,
+            'duration_seconds' => $durationSeconds,
+            'loop' => $loop,
+            'prompt_influence' => (float) config('services.elevenlabs.sound_prompt_influence', 0.45),
+            'model_id' => config('services.elevenlabs.sound_model', self::DEFAULT_SOUND_MODEL),
+        ], (int) config('services.elevenlabs.sound_timeout', 120));
 
         if ($response === null) {
             return null;
@@ -221,13 +221,13 @@ class ElevenLabsService
         $durationMs = max(3000, min(600000, $durationSeconds * 1000));
 
         $response = $this->postWithBreaker($this->url('/music', [
-                'output_format' => config('services.elevenlabs.music_output_format', 'mp3_44100_192'),
-            ]), [
-                'prompt' => $prompt,
-                'music_length_ms' => $durationMs,
-                'model_id' => config('services.elevenlabs.music_model', self::DEFAULT_MUSIC_MODEL),
-                'force_instrumental' => true,
-            ], (int) config('services.elevenlabs.music_timeout', 300));
+            'output_format' => config('services.elevenlabs.music_output_format', 'mp3_44100_192'),
+        ]), [
+            'prompt' => $prompt,
+            'music_length_ms' => $durationMs,
+            'model_id' => config('services.elevenlabs.music_model', self::DEFAULT_MUSIC_MODEL),
+            'force_instrumental' => true,
+        ], (int) config('services.elevenlabs.music_timeout', 300));
 
         if ($response === null) {
             return null;

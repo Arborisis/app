@@ -1,16 +1,18 @@
 <?php
 
 use App\Enums\RadioPodcastStatus;
+use App\Enums\RadioScheduleRepeat;
 use App\Enums\RadioShowType;
 use App\Enums\SoundStatus;
 use App\Enums\SoundVisibility;
-use App\Enums\RadioScheduleRepeat;
 use App\Models\RadioPodcast;
 use App\Models\RadioSchedule;
 use App\Models\Sound;
 use App\Models\SoundFile;
 use App\Models\User;
+use App\Services\Radio\RadioPlaylistExportService;
 use App\Services\Radio\RadioStateService;
+use App\Services\Radio\RadioStreamService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
@@ -104,7 +106,7 @@ it('returns now-playing metadata as json', function () {
     Cache::put('radio:epoch', time());
     Cache::forget('radio:playlist');
 
-    $service = app(\App\Services\Radio\RadioStreamService::class);
+    $service = app(RadioStreamService::class);
     $expected = $service->resolveCurrentSound();
 
     $response = $this->getJson('/api/radio/now-playing');
@@ -240,7 +242,7 @@ it('keeps a playable original mp3 when a stale radio conversion is missing', fun
     ]);
     Storage::disk('public')->put('sounds/original.mp3', 'fake mp3 content');
 
-    $service = app(\App\Services\Radio\RadioStreamService::class);
+    $service = app(RadioStreamService::class);
 
     expect($service->getPlayablePlaylist()->pluck('id'))->toContain($sound->id);
 });
@@ -261,7 +263,7 @@ it('excludes sounds when neither radio conversion nor original mp3 is readable',
         'radio_mime_type' => 'audio/mpeg',
     ]);
 
-    $service = app(\App\Services\Radio\RadioStreamService::class);
+    $service = app(RadioStreamService::class);
 
     expect($service->getPlayablePlaylist()->pluck('id'))->not->toContain($sound->id);
 });
@@ -305,7 +307,7 @@ it('builds playlist from public sounds only', function () {
         'mime_type' => 'audio/mpeg',
     ]);
 
-    $service = app(\App\Services\Radio\RadioStreamService::class);
+    $service = app(RadioStreamService::class);
     $playlist = $service->getPlaylist();
 
     expect($playlist->pluck('id'))->toContain($published->id)
@@ -314,7 +316,7 @@ it('builds playlist from public sounds only', function () {
 });
 
 it('tracks listener count on stream', function () {
-    $service = app(\App\Services\Radio\RadioStreamService::class);
+    $service = app(RadioStreamService::class);
 
     expect($service->getListenerCount())->toBe(0);
 
@@ -326,7 +328,7 @@ it('tracks listener count on stream', function () {
 });
 
 it('can reset active radio listeners', function () {
-    $service = app(\App\Services\Radio\RadioStreamService::class);
+    $service = app(RadioStreamService::class);
 
     $service->incrementListeners();
     expect($service->getListenerCount())->toBe(1);
@@ -336,7 +338,7 @@ it('can reset active radio listeners', function () {
 });
 
 it('does not decrement listeners below zero', function () {
-    $service = app(\App\Services\Radio\RadioStreamService::class);
+    $service = app(RadioStreamService::class);
 
     $service->decrementListeners();
     expect($service->getListenerCount())->toBe(0);
@@ -383,13 +385,13 @@ it('uses an active radio schedule before the default playlist', function () {
     ]);
     $schedule->sounds()->attach($scheduledSound->id, ['position' => 1]);
 
-    $service = app(\App\Services\Radio\RadioStreamService::class);
+    $service = app(RadioStreamService::class);
 
     expect($service->getPlaylist()->pluck('id')->all())->toBe([$scheduledSound->id]);
 });
 
 it('generates valid icy metadata', function () {
-    $service = app(\App\Services\Radio\RadioStreamService::class);
+    $service = app(RadioStreamService::class);
     $meta = $service->generateIcyMetadata('Forest Rain', 'Jane Doe');
 
     expect($meta)->toBeString()
@@ -425,7 +427,7 @@ it('returns local cache urls in m3u playlist without signatures', function () {
     ]);
     Storage::disk('public')->put('sounds/test.mp3', 'fake mp3 content');
 
-    $m3u = app(\App\Services\Radio\RadioPlaylistExportService::class)->m3u();
+    $m3u = app(RadioPlaylistExportService::class)->m3u();
 
     expect($m3u)->toContain('#EXTM3U')
         ->and($m3u)->toContain('annotate:')
@@ -437,7 +439,7 @@ it('returns local cache urls in m3u playlist without signatures', function () {
 it('includes podcast kind in now playing when updated by liquidsoap', function () {
     config(['radio.internal_token' => 'radio-test-token']);
 
-    app(\App\Services\Radio\RadioStateService::class)->update([
+    app(RadioStateService::class)->update([
         'title' => 'Nature Capsule',
         'artist' => 'Arborisis Radio',
         'duration' => 180,

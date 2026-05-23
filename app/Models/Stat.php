@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\StatCategory;
 use Carbon\Carbon;
+use Database\Factories\StatFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -29,7 +30,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Stat extends Model
 {
-    /** @use HasFactory<\Database\Factories\StatFactory> */
+    /** @use HasFactory<StatFactory> */
     use HasFactory;
 
     protected $table = 'stats';
@@ -180,7 +181,7 @@ class Stat extends Model
     /**
      * Store or update a stat by key.
      *
-     * @param array<string, mixed>|string|int|float $value
+     * @param  array<string, mixed>|string|int|float  $value
      */
     public static function put(
         string $key,

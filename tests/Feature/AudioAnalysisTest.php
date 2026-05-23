@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Enums\AnalysisStatus;
+use App\Jobs\ProcessAudioAnalysis;
 use App\Models\Sound;
 use App\Models\SoundAnalysis;
 use App\Models\SoundFile;
@@ -92,6 +93,6 @@ describe('Audio Analysis Feature Tests', function () {
                 'n_fft' => 2048,
             ]);
 
-        Queue::assertPushed(\App\Jobs\ProcessAudioAnalysis::class);
+        Queue::assertPushed(ProcessAudioAnalysis::class);
     });
 });

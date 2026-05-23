@@ -45,7 +45,7 @@ describe('ScientificStatsService', function () {
             'zero_crossing_rate' => 0.1887,
         ]);
 
-        $service = new ScientificStatsService();
+        $service = new ScientificStatsService;
 
         $averages = $service->getAudioFeatureAverages();
         $distributions = $service->getAudioFeatureDistribution();
@@ -80,7 +80,7 @@ describe('ScientificStatsService', function () {
             'zero_crossing_rate' => null,
         ]);
 
-        $averages = (new ScientificStatsService())->getAudioFeatureAverages();
+        $averages = (new ScientificStatsService)->getAudioFeatureAverages();
 
         expect($averages['rms']['mean'])->toBe(0.5);
         expect($averages['zcr']['mean'])->toBe(0.12);
@@ -129,7 +129,7 @@ describe('ScientificStatsService', function () {
             'source' => 'birdnet',
         ]);
 
-        $species = (new ScientificStatsService())->getSpeciesDistribution(filters: ['min_confidence' => 0.8]);
+        $species = (new ScientificStatsService)->getSpeciesDistribution(filters: ['min_confidence' => 0.8]);
 
         expect($species)->toHaveCount(1);
         expect($species[0]['scientific_name'])->toBe('Turdus merula');
@@ -183,7 +183,7 @@ describe('ScientificStatsService', function () {
             'source' => 'open-meteo',
         ]);
 
-        $service = new ScientificStatsService();
+        $service = new ScientificStatsService;
 
         $quality = $service->getQualityOverview();
         $completeness = $service->getDatasetCompleteness();
@@ -225,7 +225,7 @@ describe('ScientificStatsService', function () {
             ]);
         }
 
-        $service = new ScientificMetricService();
+        $service = new ScientificMetricService;
         $biodiversity = $service->computeBiodiversityScore($sound->fresh(['soundAnalysis.birdnetDetections', 'tags']));
         $activity = $service->computeAcousticActivityScore($sound->fresh(['soundAnalysis']));
 
@@ -265,7 +265,7 @@ describe('ScientificStatsService', function () {
             'location_name' => 'Paris',
         ]);
 
-        $observation = (new OpenMeteoEnvironmentalDataService())->enrichSound($sound);
+        $observation = (new OpenMeteoEnvironmentalDataService)->enrichSound($sound);
 
         expect($observation)->not->toBeNull();
         expect($observation?->source)->toBe('open-meteo');
@@ -306,7 +306,7 @@ describe('ScientificStatsService', function () {
             'status' => 'complete',
         ]);
 
-        $overview = (new ScientificStatsService())->getEnvironmentalOverview();
+        $overview = (new ScientificStatsService)->getEnvironmentalOverview();
 
         expect($overview['coverage']['percentage'])->toBe(100.0);
         expect($overview['sources'][0]['source'])->toBe('open-meteo');

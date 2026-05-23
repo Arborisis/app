@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Web;
 
-use App\Enums\HelpdeskTicketStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Helpdesk\StoreReplyRequest;
 use App\Http\Requests\Helpdesk\StoreTicketRequest;
@@ -21,8 +20,7 @@ class HelpdeskController extends Controller
     public function __construct(
         private readonly HelpdeskService $helpdeskService,
         private readonly IaSuggestionService $iaSuggestionService,
-    ) {
-    }
+    ) {}
 
     public function index(): Response
     {

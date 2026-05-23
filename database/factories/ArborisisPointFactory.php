@@ -10,6 +10,7 @@ use App\Enums\NatureSensitivityLevel;
 use App\Models\ArborisisPoint;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 class ArborisisPointFactory extends Factory
 {
@@ -23,7 +24,7 @@ class ArborisisPointFactory extends Factory
         return [
             'user_id' => User::factory(),
             'title' => $this->faker->sentence(3),
-            'slug' => fn (array $attributes) => \Illuminate\Support\Str::slug($attributes['title']) . '-' . uniqid(),
+            'slug' => fn (array $attributes) => Str::slug($attributes['title']).'-'.uniqid(),
             'description' => $this->faker->paragraph(),
             'latitude' => $lat,
             'longitude' => $lng,

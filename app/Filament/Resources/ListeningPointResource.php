@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Enums\ModerationStatus;
-use App\Enums\NatureSensitivityLevel;
 use App\Filament\Resources\ListeningPointResource\Pages;
 use App\Models\ListeningPoint;
 use App\Services\Audit\AuditLogService;

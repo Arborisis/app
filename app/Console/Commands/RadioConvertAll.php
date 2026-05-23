@@ -7,6 +7,7 @@ namespace App\Console\Commands;
 use App\Models\SoundFile;
 use App\Services\Radio\RadioConversionService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Storage;
 
 class RadioConvertAll extends Command
 {
@@ -19,7 +20,7 @@ class RadioConvertAll extends Command
     {
         $query = SoundFile::query();
 
-        if (!$this->option('force')) {
+        if (! $this->option('force')) {
             $query->whereNull('radio_path');
         }
 
@@ -42,20 +43,22 @@ class RadioConvertAll extends Command
         $skipped = 0;
 
         foreach ($files as $file) {
-            if (!$converter->isConvertible($file)) {
+            if (! $converter->isConvertible($file)) {
                 $skipped++;
                 $bar->advance();
+
                 continue;
             }
 
-            if (!$this->option('force') && $file->radio_path && \Illuminate\Support\Facades\Storage::disk($file->disk)->exists($file->radio_path)) {
+            if (! $this->option('force') && $file->radio_path && Storage::disk($file->disk)->exists($file->radio_path)) {
                 $skipped++;
                 $bar->advance();
+
                 continue;
             }
 
             if ($this->option('force') && $file->radio_path) {
-                \Illuminate\Support\Facades\Storage::disk($file->disk)->delete($file->radio_path);
+                Storage::disk($file->disk)->delete($file->radio_path);
                 $file->update([
                     'radio_path' => null,
                     'radio_mime_type' => null,

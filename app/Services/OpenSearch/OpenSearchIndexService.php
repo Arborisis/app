@@ -14,6 +14,7 @@ use OpenSearch\Common\Exceptions\Missing404Exception;
 class OpenSearchIndexService
 {
     private readonly string $prefix;
+
     private readonly bool $enabled;
 
     public function __construct(
@@ -36,6 +37,7 @@ class OpenSearchIndexService
 
         try {
             $this->client->cluster()->health();
+
             return true;
         } catch (\Exception) {
             return false;

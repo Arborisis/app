@@ -21,7 +21,7 @@ class RefreshStatsCache extends Command
             $key = $this->option('key');
             $this->info("Refreshing stat: {$key}");
             $cache->refresh($key);
-            $this->info("Done.");
+            $this->info('Done.');
 
             return self::SUCCESS;
         }

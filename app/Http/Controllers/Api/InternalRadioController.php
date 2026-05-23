@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Radio\UpdateNowPlayingRequest;
+use App\Models\RadioPodcast;
 use App\Models\RadioSetting;
+use App\Models\Sound;
 use App\Services\Radio\RadioPlaylistExportService;
 use App\Services\Radio\RadioStateService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Validator;
 
 class InternalRadioController extends Controller
 {
@@ -19,7 +22,7 @@ class InternalRadioController extends Controller
         private readonly RadioStateService $state,
     ) {}
 
-    public function playlist(Request $request): JsonResponse|\Illuminate\Http\Response
+    public function playlist(Request $request): JsonResponse|Response
     {
         if ($request->query('format') === 'm3u') {
             return response($this->playlistExport->m3u(), 200, [
@@ -36,7 +39,7 @@ class InternalRadioController extends Controller
         ]);
     }
 
-    public function playlistM3u(): \Illuminate\Http\Response
+    public function playlistM3u(): Response
     {
         $liqContent = $this->playlistExport->liq();
         $liqPath = storage_path('app/radio-cache/playlist.liq');
@@ -53,7 +56,7 @@ class InternalRadioController extends Controller
 
         // If only sound_id is provided (Liquidsoap GET update), look up the sound
         if (! empty($data['sound_id']) && empty($data['title'])) {
-            $sound = \App\Models\Sound::query()->find($data['sound_id']);
+            $sound = Sound::query()->find($data['sound_id']);
             if ($sound) {
                 $data['title'] = $sound->title;
                 $data['artist'] = $sound->user?->name ?? 'Arborisis';
@@ -64,7 +67,7 @@ class InternalRadioController extends Controller
 
         // If only podcast_id is provided, look up the podcast
         if (! empty($data['podcast_id']) && empty($data['title'])) {
-            $podcast = \App\Models\RadioPodcast::query()->find($data['podcast_id']);
+            $podcast = RadioPodcast::query()->find($data['podcast_id']);
             if ($podcast) {
                 $data['title'] = $podcast->title;
                 $data['artist'] = 'Arborisis Radio';
@@ -72,7 +75,7 @@ class InternalRadioController extends Controller
             }
         }
 
-        $validator = \Illuminate\Support\Facades\Validator::make($data, [
+        $validator = Validator::make($data, [
             'sound_id' => ['nullable', 'integer', 'exists:sounds,id'],
             'podcast_id' => ['nullable', 'integer', 'exists:radio_podcasts,id'],
             'title' => ['required', 'string', 'max:255'],
@@ -142,12 +145,12 @@ class InternalRadioController extends Controller
 
     private function publishedPodcasts(): array
     {
-        return \App\Models\RadioPodcast::query()
+        return RadioPodcast::query()
             ->readyForAir()
             ->latest('published_at')
             ->limit(10)
             ->get()
-            ->map(fn (\App\Models\RadioPodcast $podcast): array => [
+            ->map(fn (RadioPodcast $podcast): array => [
                 'id' => $podcast->id,
                 'title' => $podcast->title,
                 'description' => $podcast->description,

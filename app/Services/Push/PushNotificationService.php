@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Services\Push;
 
 use App\Models\PushSubscription;
+use Minishlink\WebPush\MessageSentReport;
 use Minishlink\WebPush\Subscription;
 use Minishlink\WebPush\WebPush;
-use Minishlink\WebPush\MessageSentReport;
 
 class PushNotificationService
 {
@@ -35,7 +35,7 @@ class PushNotificationService
     }
 
     /**
-     * @param iterable<PushSubscription> $subscriptions
+     * @param  iterable<PushSubscription>  $subscriptions
      * @return array{success: int, failures: int, removed: int}
      */
     public function sendToSubscribers(iterable $subscriptions, string $title, string $body, ?string $url = null): array
@@ -68,6 +68,7 @@ class PushNotificationService
         foreach ($this->webPush->flush() as $report) {
             if ($report->isSuccess()) {
                 $success++;
+
                 continue;
             }
 

@@ -6,10 +6,11 @@ use App\Enums\RadioDaypart;
 use App\Models\RadioHostPersonality;
 use App\Models\Sound;
 use App\Models\User;
+use App\Services\Radio\HostPersonalitySelector;
 use App\Services\Radio\Prompts\DjScriptPromptBuilder;
 
 beforeEach(function () {
-    $this->builder = new DjScriptPromptBuilder();
+    $this->builder = new DjScriptPromptBuilder;
 });
 
 function makePersonality(array $overrides = []): RadioHostPersonality
@@ -32,8 +33,8 @@ function makePersonality(array $overrides = []): RadioHostPersonality
 
 function makeSoundStub(): Sound
 {
-    $user = (new User())->forceFill(['name' => 'Aurélie Renard']);
-    $sound = new Sound();
+    $user = (new User)->forceFill(['name' => 'Aurélie Renard']);
+    $sound = new Sound;
     $sound->forceFill([
         'id' => 42,
         'title' => 'Aube en hêtraie',
@@ -167,7 +168,7 @@ it('signals when no continuity is needed', function () {
 });
 
 it('normalizes opening text for fingerprinting via the public helper', function () {
-    $selector = new App\Services\Radio\HostPersonalitySelector();
+    $selector = new HostPersonalitySelector;
 
     expect($selector->openingFromText('Dans la lumière, encore voilée du matin… on entend.'))
         ->toBe('dans la lumière encore voilée du matin on');

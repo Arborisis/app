@@ -7,8 +7,8 @@ namespace App\Filament\Resources\NewsletterSubscriberResource\Pages;
 use App\Filament\Resources\NewsletterSubscriberResource;
 use App\Models\NewsletterSubscriber;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
 use Filament\Resources\Components\Tab;
+use Filament\Resources\Pages\ListRecords;
 
 class ListNewsletterSubscribers extends ListRecords
 {

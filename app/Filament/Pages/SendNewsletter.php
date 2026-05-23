@@ -22,14 +22,21 @@ class SendNewsletter extends Page implements HasForms
     use InteractsWithForms;
 
     protected static ?string $navigationIcon = 'heroicon-o-paper-airplane';
+
     protected static ?string $navigationLabel = 'Envoyer une newsletter';
+
     protected static ?string $title = 'Envoyer une newsletter';
+
     protected static ?string $slug = 'send-newsletter';
+
     protected static string $view = 'filament.pages.send-newsletter';
+
     protected static ?string $navigationGroup = 'Communication';
+
     protected static ?int $navigationSort = 3;
 
     public ?string $subject = null;
+
     public ?string $content = null;
 
     public function mount(): void

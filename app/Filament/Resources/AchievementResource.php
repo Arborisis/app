@@ -16,10 +16,15 @@ use Filament\Tables\Table;
 class AchievementResource extends Resource
 {
     protected static ?string $model = Achievement::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-trophy';
+
     protected static ?string $navigationLabel = 'Achievements';
+
     protected static ?string $modelLabel = 'Achievement';
+
     protected static ?string $pluralModelLabel = 'Achievements';
+
     protected static ?string $navigationGroup = 'Gamification';
 
     public static function form(Form $form): Form

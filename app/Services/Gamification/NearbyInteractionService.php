@@ -16,7 +16,7 @@ class NearbyInteractionService
 
     public function canInteract(User $initiator, User $recipient): bool
     {
-        $key = self::REDIS_KEY_PREFIX . "{$initiator->id}:{$recipient->id}";
+        $key = self::REDIS_KEY_PREFIX."{$initiator->id}:{$recipient->id}";
         $last = Redis::get($key);
 
         if ($last && (time() - (int) $last) < config('gamification.nearby_interaction_cooldown', 3600)) {
@@ -83,7 +83,7 @@ class NearbyInteractionService
 
     private function recordCooldown(User $a, User $b): void
     {
-        $key = self::REDIS_KEY_PREFIX . "{$a->id}:{$b->id}";
+        $key = self::REDIS_KEY_PREFIX."{$a->id}:{$b->id}";
         Redis::setex($key, config('gamification.nearby_interaction_cooldown', 3600), time());
     }
 

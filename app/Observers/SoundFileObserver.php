@@ -6,6 +6,7 @@ namespace App\Observers;
 
 use App\Models\SoundFile;
 use App\Services\Radio\RadioConversionService;
+use Illuminate\Support\Facades\Storage;
 
 class SoundFileObserver
 {
@@ -25,7 +26,7 @@ class SoundFileObserver
     public function deleted(SoundFile $soundFile): void
     {
         if ($soundFile->radio_path) {
-            \Illuminate\Support\Facades\Storage::disk($soundFile->disk)->delete($soundFile->radio_path);
+            Storage::disk($soundFile->disk)->delete($soundFile->radio_path);
         }
     }
 }

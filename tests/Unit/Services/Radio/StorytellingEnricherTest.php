@@ -2,8 +2,14 @@
 
 declare(strict_types=1);
 
+use App\Enums\RadioDaypart;
+use App\Models\RadioHostPersonality;
 use App\Models\Sound;
 use App\Models\SpeciesFact;
+use App\Services\AI\OpenRouterService;
+use App\Services\Radio\DjScriptGenerator;
+use App\Services\Radio\HostPersonalitySelector;
+use App\Services\Radio\Prompts\DjScriptPromptBuilder;
 use App\Services\Radio\RadioHostContextService;
 use App\Services\Radio\StorytellingEnricher;
 
@@ -59,7 +65,7 @@ it('injects storytelling hints in the DJ prompt when continuity is enabled', fun
 
     $sound = Sound::factory()->create(['title' => 'Aube en hêtraie']);
 
-    $personality = \App\Models\RadioHostPersonality::query()->create([
+    $personality = RadioHostPersonality::query()->create([
         'slug' => 'solene_poete',
         'display_name' => 'Solène',
         'voice_provider' => 'elevenlabs',
@@ -89,10 +95,10 @@ it('injects storytelling hints in the DJ prompt when continuity is enabled', fun
             'species' => null,
         ]);
 
-    $generator = new \App\Services\Radio\DjScriptGenerator(
-        new \App\Services\Radio\Prompts\DjScriptPromptBuilder(),
-        new \App\Services\Radio\HostPersonalitySelector(),
-        Mockery::mock(\App\Services\AI\OpenRouterService::class),
+    $generator = new DjScriptGenerator(
+        new DjScriptPromptBuilder,
+        new HostPersonalitySelector,
+        Mockery::mock(OpenRouterService::class),
         $context,
         $storytelling,
     );
@@ -100,7 +106,7 @@ it('injects storytelling hints in the DJ prompt when continuity is enabled', fun
     $prepared = $generator->prepare(
         sound: $sound,
         personality: $personality,
-        daypart: \App\Enums\RadioDaypart::Dawn,
+        daypart: RadioDaypart::Dawn,
     );
 
     expect($prepared['prompts']['user'])->toContain('ENRICHISSEMENT ÉDITORIAL');

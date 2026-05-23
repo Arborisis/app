@@ -1,10 +1,13 @@
 <?php
 
 use App\Jobs\CleanExpiredPresence;
+use App\Jobs\GenerateDailyBlogPost;
 use App\Jobs\GenerateDailyQuests;
+use App\Jobs\GenerateDailySoundIdeas;
 use App\Jobs\GenerateWeeklyQuests;
 use App\Jobs\Stats\RefreshStatsCacheJob;
 use App\Jobs\ValidateSuspiciousVisits;
+use App\Services\Radio\RadioPlaylistExportService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -18,8 +21,8 @@ Schedule::job(new CleanExpiredPresence)->everyFiveMinutes();
 Schedule::job(new GenerateDailyQuests)->dailyAt('00:01');
 Schedule::job(new GenerateWeeklyQuests)->weeklyOn(1, '00:05');
 Schedule::job(new ValidateSuspiciousVisits)->everyThirtyMinutes();
-Schedule::job(new \App\Jobs\GenerateDailySoundIdeas)->dailyAt('00:03');
-Schedule::job(new \App\Jobs\GenerateDailyBlogPost)->dailyAt(config('blog.daily_at', '07:00'))
+Schedule::job(new GenerateDailySoundIdeas)->dailyAt('00:03');
+Schedule::job(new GenerateDailyBlogPost)->dailyAt(config('blog.daily_at', '07:00'))
     ->when(fn () => config('blog.ai_enabled', true));
 
 // Radio generated formats: one generation per day for each format.
@@ -41,7 +44,7 @@ Schedule::command('radio:listeners:purge')->everyTwoMinutes();
 
 // Radio playlist .liq file regeneration (every 5 minutes)
 Schedule::call(function () {
-    $export = app(\App\Services\Radio\RadioPlaylistExportService::class);
+    $export = app(RadioPlaylistExportService::class);
     $liqPath = storage_path('app/radio-cache/playlist.liq');
     file_put_contents($liqPath, $export->liq(), LOCK_EX);
 })->everyFiveMinutes();

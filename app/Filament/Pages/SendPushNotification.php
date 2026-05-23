@@ -6,8 +6,8 @@ namespace App\Filament\Pages;
 
 use App\Services\Push\PushNotificationService;
 use Filament\Actions\Action;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
@@ -19,13 +19,19 @@ class SendPushNotification extends Page implements HasForms
     use InteractsWithForms;
 
     protected static ?string $navigationIcon = 'heroicon-o-bell-alert';
+
     protected static ?string $navigationLabel = 'Envoyer une notification';
+
     protected static ?string $title = 'Envoyer une notification push';
+
     protected static ?string $slug = 'send-push-notification';
+
     protected static string $view = 'filament.pages.send-push-notification';
 
     public ?string $titleField = null;
+
     public ?string $bodyField = null;
+
     public ?string $urlField = '/';
 
     public function mount(): void

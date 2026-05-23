@@ -32,7 +32,7 @@ class ValidateSuspiciousVisits implements ShouldQueue
             if ($recentSuspiciousCount >= 3) {
                 $visit->update([
                     'status' => VisitStatus::Invalid,
-                    'anti_cheat_notes' => ($visit->anti_cheat_notes ?? '') . ' | Auto-invalidated: multiple suspicious visits.',
+                    'anti_cheat_notes' => ($visit->anti_cheat_notes ?? '').' | Auto-invalidated: multiple suspicious visits.',
                 ]);
             } else {
                 $visit->update([

@@ -107,7 +107,7 @@ class ArborisisPointService
         $count = 1;
 
         while (ArborisisPoint::where('slug', $slug)->exists()) {
-            $slug = $base . '-' . $count;
+            $slug = $base.'-'.$count;
             $count++;
         }
 

@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -161,8 +162,8 @@ return new class extends Migration
 
     private function hasIndex(string $table, string $index): bool
     {
-        $indexes = \Illuminate\Support\Facades\DB::select(
-            "SELECT indexname FROM pg_indexes WHERE tablename = ?",
+        $indexes = DB::select(
+            'SELECT indexname FROM pg_indexes WHERE tablename = ?',
             [$table]
         );
 

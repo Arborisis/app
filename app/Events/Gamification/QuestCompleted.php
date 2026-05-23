@@ -12,7 +12,5 @@ class QuestCompleted
 {
     use Dispatchable, SerializesModels;
 
-    public function __construct(public QuestProgress $progress)
-    {
-    }
+    public function __construct(public QuestProgress $progress) {}
 }

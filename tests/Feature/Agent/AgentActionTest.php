@@ -6,7 +6,9 @@ namespace Tests\Feature\Agent;
 
 use App\Enums\ArborisisCategory;
 use App\Enums\ModerationStatus;
+use App\Models\SoundWalk;
 use App\Models\User;
+use App\Services\Gamification\SoundWalkService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
@@ -157,7 +159,7 @@ class AgentActionTest extends TestCase
 
         $response->assertCreated();
 
-        $soundWalk = \App\Models\SoundWalk::with('points')->firstOrFail();
+        $soundWalk = SoundWalk::with('points')->firstOrFail();
 
         expect($soundWalk->route_geometry['source'])->toBe('osrm')
             ->and($soundWalk->route_geometry['coordinates'])->toHaveCount(3)
@@ -198,7 +200,7 @@ class AgentActionTest extends TestCase
             ]),
         ]);
 
-        $preview = app(\App\Services\Gamification\SoundWalkService::class)->previewItinerary([
+        $preview = app(SoundWalkService::class)->previewItinerary([
             'title' => 'Boucle réelle de Laeken',
             'waypoints' => [
                 ['title' => 'Parc de Laeken', 'place_query' => 'Parc de Laeken, Bruxelles, Belgique', 'order' => 0],

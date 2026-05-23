@@ -6,7 +6,7 @@ namespace App\Enums;
 
 enum RadioShowType: string
 {
-    case Podcast  = 'podcast';
-    case Flash    = 'flash';
+    case Podcast = 'podcast';
+    case Flash = 'flash';
     case Emission = 'emission';
 }

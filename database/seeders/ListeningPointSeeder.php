@@ -7,8 +7,6 @@ namespace Database\Seeders;
 use App\Enums\ModerationStatus;
 use App\Enums\NatureSensitivityLevel;
 use App\Models\ListeningPoint;
-use App\Models\Sound;
-use App\Models\SoundLocation;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 

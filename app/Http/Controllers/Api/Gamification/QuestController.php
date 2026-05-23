@@ -18,8 +18,7 @@ class QuestController extends Controller
 {
     public function __construct(
         private readonly QuestService $questService,
-    ) {
-    }
+    ) {}
 
     public function index(Request $request): JsonResponse
     {

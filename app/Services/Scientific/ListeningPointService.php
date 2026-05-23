@@ -6,10 +6,11 @@ namespace App\Services\Scientific;
 
 use App\Enums\ModerationStatus;
 use App\Enums\NatureSensitivityLevel;
+use App\Models\BirdnetDetection;
+use App\Models\EnvironmentalObservation;
 use App\Models\ListeningPoint;
 use App\Models\Sound;
 use App\Models\SoundLocation;
-use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class ListeningPointService
@@ -130,7 +131,7 @@ class ListeningPointService
         $lastRecordedAt = $sounds->max('recorded_at');
 
         // Compte des espèces détectées distinctes
-        $speciesCount = \App\Models\BirdnetDetection::whereIn('sound_id', $sounds->pluck('id'))
+        $speciesCount = BirdnetDetection::whereIn('sound_id', $sounds->pluck('id'))
             ->distinct('scientific_name')
             ->count('scientific_name');
 
@@ -168,7 +169,7 @@ class ListeningPointService
                 ->update(['listening_point_id' => $target->id]);
 
             // Déplacer les observations environnementales
-            \App\Models\EnvironmentalObservation::where('listening_point_id', $source->id)
+            EnvironmentalObservation::where('listening_point_id', $source->id)
                 ->update(['listening_point_id' => $target->id]);
 
             // Soft delete du source

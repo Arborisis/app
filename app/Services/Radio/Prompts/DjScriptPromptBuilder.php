@@ -19,7 +19,7 @@ class DjScriptPromptBuilder
     /**
      * @param  array<int, string>  $recentOpenings  Phrases (lowercased) the LLM should NOT start with.
      * @param  array<string, mixed>|null  $previousSound  Minimal payload {title, creator, category} of the previous track.
-     * @param  array<string, mixed>|null  $soundPayload   Full sound payload from RadioHostContextService::soundPayload().
+     * @param  array<string, mixed>|null  $soundPayload  Full sound payload from RadioHostContextService::soundPayload().
      * @param  array<string, mixed>|null  $storytelling  Enriched ecology/continuity hints from StorytellingEnricher.
      * @return array{system: string, user: string}
      */
@@ -87,7 +87,7 @@ TXT;
         $continuityBlock = $previousSound === null
             ? "Il n'y a pas de transition à faire : tu ouvres librement."
             : sprintf(
-                "Tu enchaînes après une écoute : « %s » par %s. Tu peux faire une transition discrète, mais sans forcer.",
+                'Tu enchaînes après une écoute : « %s » par %s. Tu peux faire une transition discrète, mais sans forcer.',
                 $previousSound['title'] ?? '—',
                 $previousSound['creator'] ?? 'un créateur de la communauté',
             );

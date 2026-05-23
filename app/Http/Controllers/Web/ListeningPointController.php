@@ -13,8 +13,8 @@ use App\Services\Scientific\GeoMatchingService;
 use App\Services\Scientific\OpenMeteoEnvironmentalDataService;
 use App\Services\Scientific\ScientificStatsService;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -105,7 +105,7 @@ class ListeningPointController extends Controller
                     ->whereNotNull('cover_image')
                     ->latest('recorded_at')
                     ->value('cover_image')
-                    ? (fn ($cover) => \Illuminate\Support\Facades\Storage::disk('public')->url($cover))($point->sounds()->public()->whereNotNull('cover_image')->latest('recorded_at')->value('cover_image'))
+                    ? (fn ($cover) => Storage::disk('public')->url($cover))($point->sounds()->public()->whereNotNull('cover_image')->latest('recorded_at')->value('cover_image'))
                     : null,
             ]);
 

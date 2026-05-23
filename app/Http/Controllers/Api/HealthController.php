@@ -26,7 +26,7 @@ class HealthController extends Controller
             'disk' => $this->checkDiskSpace(),
         ];
 
-        $allHealthy = !in_array(false, array_column($checks, 'healthy'), true);
+        $allHealthy = ! in_array(false, array_column($checks, 'healthy'), true);
 
         return response()->json([
             'status' => $allHealthy ? 'ok' : 'degraded',
@@ -91,6 +91,7 @@ class HealthController extends Controller
     {
         $start = microtime(true);
         $callback();
+
         return round((microtime(true) - $start) * 1000, 2);
     }
 }

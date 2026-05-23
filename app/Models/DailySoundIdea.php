@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -37,7 +38,7 @@ class DailySoundIdea extends Model
         return $this->hasMany(UserSoundIdeaProgress::class);
     }
 
-    public function scopeForDate($query, \Carbon\Carbon $date)
+    public function scopeForDate($query, Carbon $date)
     {
         return $query->whereDate('date', $date);
     }

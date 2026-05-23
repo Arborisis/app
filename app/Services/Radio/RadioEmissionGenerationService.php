@@ -11,6 +11,7 @@ use App\Models\RadioPodcast;
 use App\Models\Sound;
 use App\Services\AI\ElevenLabsService;
 use App\Services\AI\OpenRouterService;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -160,7 +161,7 @@ class RadioEmissionGenerationService
                 throw new \RuntimeException("Actual emission duration {$actualDuration}s out of bounds [{$minDurationFloor}, 1200]");
             }
 
-            $normalizedFile = $assembled . '_norm.mp3';
+            $normalizedFile = $assembled.'_norm.mp3';
             $normSuccess = $this->normalization->normalize($assembled, $normalizedFile);
             @unlink($assembled);
 
@@ -169,7 +170,7 @@ class RadioEmissionGenerationService
             }
 
             $disk = config('radio.host.storage_disk', 'r2');
-            $path = 'radio/podcasts/' . $podcast->id . '.mp3';
+            $path = 'radio/podcasts/'.$podcast->id.'.mp3';
             $stream = fopen($normalizedFile, 'r');
             Storage::disk($disk)->put($path, $stream);
             fclose($stream);
@@ -228,9 +229,9 @@ class RadioEmissionGenerationService
     }
 
     /**
-     * @return \Illuminate\Support\Collection<int, Sound>
+     * @return Collection<int, Sound>
      */
-    private function selectSoundsForEmission(): \Illuminate\Support\Collection
+    private function selectSoundsForEmission(): Collection
     {
         $minSounds = (int) config('radio.host.emission_min_sounds', 3);
         $maxSounds = (int) config('radio.host.emission_max_sounds', 5);
@@ -268,7 +269,7 @@ class RadioEmissionGenerationService
             return null;
         }
 
-        $tempCopy = sys_get_temp_dir() . '/' . Str::uuid() . '_sound_' . $sound->id . '.mp3';
+        $tempCopy = sys_get_temp_dir().'/'.Str::uuid().'_sound_'.$sound->id.'.mp3';
         copy($cachedPath, $tempCopy);
 
         return $tempCopy;

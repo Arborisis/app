@@ -32,10 +32,11 @@ class MigrateStorageToR2 extends Command
             "Cette commande va copier tous les fichiers du disque '{$sourceDisk}' vers '{$targetDisk}' et mettre à jour la base de données. Continuer ?"
         )) {
             $this->info('Migration annulée.');
+
             return self::SUCCESS;
         }
 
-        $this->info("Migration {$sourceDisk} → {$targetDisk}" . ($dryRun ? ' (DRY RUN)' : ''));
+        $this->info("Migration {$sourceDisk} → {$targetDisk}".($dryRun ? ' (DRY RUN)' : ''));
 
         $totalMigrated = 0;
         $totalFailed = 0;
@@ -119,7 +120,7 @@ class MigrateStorageToR2 extends Command
             });
 
         $this->newLine();
-        $this->info("=== Résumé ===");
+        $this->info('=== Résumé ===');
         $this->info("Migrés  : {$totalMigrated}");
         $this->error("Échecs  : {$totalFailed}");
 
@@ -158,6 +159,7 @@ class MigrateStorageToR2 extends Command
             return true;
         } catch (Throwable $e) {
             report($e);
+
             return false;
         }
     }

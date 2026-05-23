@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Events\AudioAnalysisCompleted;
 use App\Events\DiscordNotification;
 use App\Events\Gamification\ArborisisPointApproved;
 use App\Events\Gamification\ArborisisPointSubmitted;
@@ -12,11 +13,10 @@ use App\Events\Gamification\ProfileUpdated;
 use App\Events\Gamification\SoundLiked;
 use App\Events\Gamification\SoundListened;
 use App\Events\Gamification\UserLoggedIn;
-use App\Events\AudioAnalysisCompleted;
 use App\Events\SoundAnalyzed;
 use App\Events\SoundPublished;
-use App\Jobs\OpenSearch\IndexSoundInOpenSearch;
 use App\Jobs\OpenSearch\IndexListeningPointInOpenSearch;
+use App\Jobs\OpenSearch\IndexSoundInOpenSearch;
 use App\Jobs\Scientific\ComputeScientificMetricsJob;
 use App\Listeners\AwardMedals;
 use App\Listeners\AwardMedalsOnPointApproved;
@@ -25,9 +25,9 @@ use App\Listeners\AwardXp;
 use App\Listeners\CheckAchievements;
 use App\Listeners\CheckAchievementsOnPointApproved;
 use App\Listeners\CheckAchievementsOnPointSubmitted;
+use App\Listeners\CheckAchievementsOnProfileUpdated;
 use App\Listeners\CheckAchievementsOnSoundListened;
 use App\Listeners\CheckAchievementsOnSoundPublished;
-use App\Listeners\CheckAchievementsOnProfileUpdated;
 use App\Listeners\CheckAchievementsOnUserLoggedIn;
 use App\Listeners\DispatchDiscordNotification;
 use App\Listeners\NotifyDiscordOnRegistration;
@@ -41,32 +41,33 @@ use App\Listeners\UpdateQuestProgressOnSoundLiked;
 use App\Listeners\UpdateQuestProgressOnSoundListened;
 use App\Listeners\UpdateQuestProgressOnSoundPublished;
 use App\Listeners\UpdateQuestProgressOnUserLoggedIn;
-use Illuminate\Auth\Events\Registered;
-use SocialiteProviders\Discord\DiscordExtendSocialite;
-use SocialiteProviders\Manager\SocialiteWasCalled;
 use App\Models\ArborisisPoint;
+use App\Models\ChatMessage;
+use App\Models\ChatRoom;
 use App\Models\ContactTicket;
+use App\Models\HelpdeskTicket;
 use App\Models\ListeningPoint;
 use App\Models\SoundFile;
 use App\Models\User;
 use App\Observers\ListeningPointObserver;
 use App\Observers\SoundFileObserver;
 use App\Observers\UserObserver;
-use App\Models\ChatMessage;
-use App\Models\ChatRoom;
-use App\Models\HelpdeskTicket;
 use App\Policies\ArborisisPointPolicy;
 use App\Policies\ChatMessagePolicy;
 use App\Policies\ChatRoomPolicy;
 use App\Policies\ContactTicketPolicy;
 use App\Policies\HelpdeskTicketPolicy;
+use App\Services\Storage\SignedUrlService;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
-use App\Services\Storage\SignedUrlService;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
+use SocialiteProviders\Discord\DiscordExtendSocialite;
+use SocialiteProviders\Manager\SocialiteWasCalled;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -102,7 +103,7 @@ class AppServiceProvider extends ServiceProvider
 
         Event::listen(SoundPublished::class, SendNewSoundPushNotification::class);
         Event::listen(DiscordNotification::class, DispatchDiscordNotification::class);
-        Event::listen(Registered::class, \Illuminate\Auth\Listeners\SendEmailVerificationNotification::class);
+        Event::listen(Registered::class, SendEmailVerificationNotification::class);
         Event::listen(Registered::class, NotifyDiscordOnRegistration::class);
         Event::listen(SocialiteWasCalled::class, DiscordExtendSocialite::class);
 

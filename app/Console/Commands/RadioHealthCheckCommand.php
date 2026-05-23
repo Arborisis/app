@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Enums\RadioPodcastStatus;
+use App\Models\RadioPodcast;
 use App\Services\Radio\RadioAudioCacheService;
 use App\Services\Radio\RadioStateService;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -37,7 +40,7 @@ class RadioHealthCheckCommand extends Command
         }
 
         // 2. Cached sounds count
-        $cachedSounds = count(glob($diskRoot . 'sounds/*.mp3') ?: []);
+        $cachedSounds = count(glob($diskRoot.'sounds/*.mp3') ?: []);
         $checks[] = [
             'name' => 'Cached sounds',
             'status' => $cachedSounds > 0 ? 'ok' : 'warning',
@@ -49,7 +52,7 @@ class RadioHealthCheckCommand extends Command
 
         // 3. Icecast status
         $icecastBaseUrl = config('radio.icecast_base_url', 'http://127.0.0.1:8000');
-        $icecastStatusUrl = rtrim($icecastBaseUrl, '/') . '/status-json.xsl';
+        $icecastStatusUrl = rtrim($icecastBaseUrl, '/').'/status-json.xsl';
         try {
             $icecastResponse = Http::timeout(5)->get($icecastStatusUrl);
             $icecastOk = $icecastResponse->successful();
@@ -68,7 +71,7 @@ class RadioHealthCheckCommand extends Command
         // 4. Liquidsoap last seen
         $status = Cache::get(RadioStateService::CACHE_KEY_STATUS, []);
         $lastSeen = $status['last_seen_at'] ?? null;
-        $liquidsoapOk = $lastSeen && now()->diffInMinutes(\Carbon\Carbon::parse($lastSeen)) < 5;
+        $liquidsoapOk = $lastSeen && now()->diffInMinutes(Carbon::parse($lastSeen)) < 5;
         $checks[] = [
             'name' => 'Liquidsoap heartbeat',
             'status' => $liquidsoapOk ? 'ok' : 'warning',
@@ -85,15 +88,15 @@ class RadioHealthCheckCommand extends Command
         $checks[] = [
             'name' => 'Podcast pipeline configured',
             'status' => $podcastOk ? 'ok' : 'warning',
-            'detail' => 'OpenRouter: ' . ($openRouterKey ? 'yes' : 'no') . ', ElevenLabs: ' . ($elevenlabsKey ? 'yes' : 'no'),
+            'detail' => 'OpenRouter: '.($openRouterKey ? 'yes' : 'no').', ElevenLabs: '.($elevenlabsKey ? 'yes' : 'no'),
         ];
         if (! $podcastOk && $exitCode < 1) {
             $exitCode = 1;
         }
 
         // 6. Recent podcast failures
-        $failedCount = \App\Models\RadioPodcast::query()
-            ->where('status', \App\Enums\RadioPodcastStatus::Failed)
+        $failedCount = RadioPodcast::query()
+            ->where('status', RadioPodcastStatus::Failed)
             ->where('failed_at', '>=', now()->subDay())
             ->count();
         $failuresOk = $failedCount < 5;

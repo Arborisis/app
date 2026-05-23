@@ -286,7 +286,7 @@ HTML)->header('Content-Type', 'text/html; charset=UTF-8');
     }
 
     /**
-     * @param array<string, mixed> $payload
+     * @param  array<string, mixed>  $payload
      */
     private function linkset(array $payload): JsonResponse
     {

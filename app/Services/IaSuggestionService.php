@@ -110,14 +110,14 @@ class IaSuggestionService
         $category = $ticket->category?->name ?? 'Non catégorisé';
 
         return sprintf(
-            "Tu es Sylve, l'agent support d'Arborisis. Un utilisateur a ouvert un ticket de support.\n\n" .
-            "Numéro : %s\n" .
-            "Catégorie : %s\n" .
-            "Priorité : %s\n" .
-            "Sujet : %s\n" .
-            "Description : %s\n\n" .
-            "Rédige une réponse professionnelle, empathique et concise en français. " .
-            "Ne pose pas de questions, propose directement une solution ou les prochaines étapes. " .
+            "Tu es Sylve, l'agent support d'Arborisis. Un utilisateur a ouvert un ticket de support.\n\n".
+            "Numéro : %s\n".
+            "Catégorie : %s\n".
+            "Priorité : %s\n".
+            "Sujet : %s\n".
+            "Description : %s\n\n".
+            'Rédige une réponse professionnelle, empathique et concise en français. '.
+            'Ne pose pas de questions, propose directement une solution ou les prochaines étapes. '.
             "Signe la réponse 'Sylve — Équipe Arborisis'.",
             $ticket->ticket_number,
             $category,

@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Models\RadioDjAnnouncement;
+use App\Models\RadioJingle;
+use App\Models\RadioPodcast;
+use App\Models\Sound;
 use App\Services\Radio\RadioAudioCacheService;
 use App\Services\Radio\RadioPlaylistExportService;
 use Illuminate\Console\Command;
@@ -31,6 +35,7 @@ class RadioRebuildCacheCommand extends Command
 
             if ($dryRun) {
                 $this->dryRunForType($type);
+
                 continue;
             }
 
@@ -57,7 +62,7 @@ class RadioRebuildCacheCommand extends Command
 
     private function warmSounds(RadioAudioCacheService $cache): void
     {
-        $query = \App\Models\Sound::public()->with('soundFile');
+        $query = Sound::public()->with('soundFile');
         $bar = $this->output->createProgressBar($query->count());
 
         foreach ($query->cursor() as $sound) {
@@ -75,7 +80,7 @@ class RadioRebuildCacheCommand extends Command
 
     private function warmJingles(RadioAudioCacheService $cache): void
     {
-        $query = \App\Models\RadioJingle::query()->where('is_active', true);
+        $query = RadioJingle::query()->where('is_active', true);
         $bar = $this->output->createProgressBar($query->count());
 
         foreach ($query->cursor() as $jingle) {
@@ -93,7 +98,7 @@ class RadioRebuildCacheCommand extends Command
 
     private function warmPodcasts(RadioAudioCacheService $cache): void
     {
-        $query = \App\Models\RadioPodcast::query()->published();
+        $query = RadioPodcast::query()->published();
         $bar = $this->output->createProgressBar($query->count());
 
         foreach ($query->cursor() as $podcast) {
@@ -111,7 +116,7 @@ class RadioRebuildCacheCommand extends Command
 
     private function warmDj(RadioAudioCacheService $cache): void
     {
-        $query = \App\Models\RadioDjAnnouncement::query();
+        $query = RadioDjAnnouncement::query();
         $bar = $this->output->createProgressBar($query->count());
 
         foreach ($query->cursor() as $ann) {
@@ -130,12 +135,12 @@ class RadioRebuildCacheCommand extends Command
     private function dryRunForType(string $type): void
     {
         $ids = match ($type) {
-            'sounds' => \App\Models\Sound::public()
+            'sounds' => Sound::public()
                 ->whereHas('soundFile', fn ($q) => $q->whereNotNull('path'))
                 ->pluck('id'),
-            'jingles' => \App\Models\RadioJingle::query()->where('is_active', true)->pluck('id'),
-            'podcasts' => \App\Models\RadioPodcast::query()->published()->pluck('id'),
-            'dj' => \App\Models\RadioDjAnnouncement::query()->pluck('id'),
+            'jingles' => RadioJingle::query()->where('is_active', true)->pluck('id'),
+            'podcasts' => RadioPodcast::query()->published()->pluck('id'),
+            'dj' => RadioDjAnnouncement::query()->pluck('id'),
             default => collect(),
         };
 

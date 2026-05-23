@@ -7,8 +7,8 @@ namespace App\Http\Controllers\Api\Internal;
 use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -16,6 +16,7 @@ use Illuminate\Support\Str;
 final class WikiOAuthController
 {
     private const CODE_TTL = 300; // 5 minutes
+
     private const TOKEN_TTL = 3600; // 1 hour
 
     public function authorize(Request $request): RedirectResponse

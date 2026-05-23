@@ -19,6 +19,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AudioAnalysisController extends Controller
 {
@@ -94,7 +95,7 @@ class AudioAnalysisController extends Controller
         ]);
     }
 
-    public function export(Sound $sound, string $format): JsonResponse|\Symfony\Component\HttpFoundation\StreamedResponse
+    public function export(Sound $sound, string $format): JsonResponse|StreamedResponse
     {
         $analysis = SoundAnalysis::where('sound_id', $sound->id)->firstOrFail();
         Gate::authorize('export', [SoundAnalysis::class, $analysis]);
@@ -109,7 +110,7 @@ class AudioAnalysisController extends Controller
             echo $export['content'];
         }, 200, [
             'Content-Type' => $export['mime'],
-            'Content-Disposition' => 'attachment; filename="' . $export['filename'] . '"',
+            'Content-Disposition' => 'attachment; filename="'.$export['filename'].'"',
         ]);
     }
 

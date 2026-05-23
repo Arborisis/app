@@ -2,13 +2,15 @@
 
 declare(strict_types=1);
 
+use App\Enums\UserRole;
 use App\Models\NewsletterSubscriber;
 use App\Models\User;
+use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\Mail;
 
 beforeEach(function () {
     Mail::fake();
-    $this->withoutMiddleware(\Illuminate\Routing\Middleware\ThrottleRequests::class);
+    $this->withoutMiddleware(ThrottleRequests::class);
 });
 
 describe('Newsletter Subscription', function () {
@@ -112,7 +114,7 @@ describe('Newsletter Unsubscription', function () {
 
 describe('Newsletter Admin Access', function () {
     it('allows admin to access newsletter resources', function () {
-        $admin = User::factory()->create(['role' => \App\Enums\UserRole::Admin]);
+        $admin = User::factory()->create(['role' => UserRole::Admin]);
 
         $this->actingAs($admin)
             ->get('/admin/newsletter-campaigns')
@@ -128,7 +130,7 @@ describe('Newsletter Admin Access', function () {
     });
 
     it('allows moderator to access newsletter resources', function () {
-        $moderator = User::factory()->create(['role' => \App\Enums\UserRole::Moderator]);
+        $moderator = User::factory()->create(['role' => UserRole::Moderator]);
 
         $this->actingAs($moderator)
             ->get('/admin/newsletter-campaigns')
@@ -140,7 +142,7 @@ describe('Newsletter Admin Access', function () {
     });
 
     it('restricts send-newsletter page to admin only', function () {
-        $moderator = User::factory()->create(['role' => \App\Enums\UserRole::Moderator]);
+        $moderator = User::factory()->create(['role' => UserRole::Moderator]);
 
         $this->actingAs($moderator)
             ->get('/admin/send-newsletter')

@@ -52,14 +52,14 @@ class AudioAnalysisService
             'failed_reason' => null,
         ]);
 
-        $tempDir = storage_path('app/temp/analysis_' . $sound->id . '_' . uniqid());
+        $tempDir = storage_path('app/temp/analysis_'.$sound->id.'_'.uniqid());
         if (! is_dir($tempDir)) {
             mkdir($tempDir, 0755, true);
         }
 
         try {
             $localPath = $this->downloadAudioTemporarily($sound, $tempDir);
-            $outputDir = $tempDir . '/output';
+            $outputDir = $tempDir.'/output';
             mkdir($outputDir, 0755, true);
 
             $result = $this->pythonRunner->runAnalysisPipeline($localPath, $outputDir, $config);
@@ -120,6 +120,7 @@ class AudioAnalysisService
 
         if ($format === 'csv') {
             $csv = $this->featuresToCsv($features);
+
             return [
                 'content' => $csv,
                 'mime' => 'text/csv',
@@ -135,7 +136,7 @@ class AudioAnalysisService
         $file = $sound->soundFile;
         $disk = Storage::disk($file->disk);
 
-        $localPath = $tempDir . '/' . basename($file->path);
+        $localPath = $tempDir.'/'.basename($file->path);
         $content = $disk->get($file->path);
 
         if ($content === null) {
@@ -162,13 +163,13 @@ class AudioAnalysisService
         foreach ($vizMap as $fileKey => $vizData) {
             $enumType = $vizData['type'];
             $fileName = $vizData['file'];
-            $localPath = $outputDir . '/' . $fileName;
+            $localPath = $outputDir.'/'.$fileName;
 
             if (! file_exists($localPath)) {
                 continue;
             }
 
-            $storedPath = $vizDir . '/' . $fileName;
+            $storedPath = $vizDir.'/'.$fileName;
             Storage::disk($diskName)->put($storedPath, file_get_contents($localPath));
 
             $scale = FrequencyScale::LINEAR;
@@ -215,16 +216,17 @@ class AudioAnalysisService
                 foreach ($value as $subKey => $subVal) {
                     if (is_array($subVal)) {
                         foreach ($subVal as $nestedKey => $nestedVal) {
-                            $lines[] = "{$key}.{$subKey}.{$nestedKey}," . (is_numeric($nestedVal) ? number_format((float) $nestedVal, 6) : json_encode($nestedVal));
+                            $lines[] = "{$key}.{$subKey}.{$nestedKey},".(is_numeric($nestedVal) ? number_format((float) $nestedVal, 6) : json_encode($nestedVal));
                         }
                     } else {
-                        $lines[] = "{$key}.{$subKey}," . (is_numeric($subVal) ? number_format((float) $subVal, 6) : json_encode($subVal));
+                        $lines[] = "{$key}.{$subKey},".(is_numeric($subVal) ? number_format((float) $subVal, 6) : json_encode($subVal));
                     }
                 }
             } else {
-                $lines[] = "{$key}," . (is_numeric($value) ? number_format((float) $value, 6) : json_encode($value));
+                $lines[] = "{$key},".(is_numeric($value) ? number_format((float) $value, 6) : json_encode($value));
             }
         }
-        return "feature,value\n" . implode("\n", $lines);
+
+        return "feature,value\n".implode("\n", $lines);
     }
 }

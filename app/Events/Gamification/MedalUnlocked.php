@@ -12,7 +12,5 @@ class MedalUnlocked
 {
     use Dispatchable, SerializesModels;
 
-    public function __construct(public UserMedal $userMedal)
-    {
-    }
+    public function __construct(public UserMedal $userMedal) {}
 }

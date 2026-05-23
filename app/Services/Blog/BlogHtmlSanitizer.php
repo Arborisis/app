@@ -34,7 +34,7 @@ class BlogHtmlSanitizer
 
     public function sanitize(string $html): string
     {
-        $document = new DOMDocument();
+        $document = new DOMDocument;
 
         $previous = libxml_use_internal_errors(true);
         $document->loadHTML(
@@ -69,6 +69,7 @@ class BlogHtmlSanitizer
             $tagName = strtolower($child->tagName);
             if (! in_array($tagName, self::ALLOWED_TAGS, true)) {
                 $this->unwrapNode($child);
+
                 continue;
             }
 

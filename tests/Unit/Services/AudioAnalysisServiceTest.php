@@ -37,7 +37,7 @@ beforeEach(function () {
 
 describe('FeatureExtractorService', function () {
     it('extracts temporal features', function () {
-        $service = new FeatureExtractorService();
+        $service = new FeatureExtractorService;
         $features = $service->getTemporalFeatures($this->analysis);
 
         expect($features)->toHaveKey('zero_crossing_rate');
@@ -46,7 +46,7 @@ describe('FeatureExtractorService', function () {
     });
 
     it('extracts spectral features', function () {
-        $service = new FeatureExtractorService();
+        $service = new FeatureExtractorService;
         $features = $service->getSpectralFeatures($this->analysis);
 
         expect($features)->toHaveKey('spectral_centroid');
@@ -54,7 +54,7 @@ describe('FeatureExtractorService', function () {
     });
 
     it('returns public summary with key metrics', function () {
-        $service = new FeatureExtractorService();
+        $service = new FeatureExtractorService;
         $summary = $service->getPublicSummary($this->analysis);
 
         expect($summary)->toHaveKeys(['duration_seconds', 'rms_mean', 'zcr_mean', 'centroid_mean']);
@@ -111,5 +111,5 @@ describe('AudioAnalysisService', function () {
         $service = new AudioAnalysisService($mockRunner);
 
         $service->exportFeatures($this->analysis, 'pdf');
-    })->throws(\InvalidArgumentException::class);
+    })->throws(InvalidArgumentException::class);
 });

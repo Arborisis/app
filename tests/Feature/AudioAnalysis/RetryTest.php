@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\UserRole;
 use App\Models\Sound;
 use App\Models\SoundAnalysis;
 use App\Models\User;
@@ -23,7 +24,7 @@ it('allows owner to retry analysis', function () {
 
 it('allows admin to retry analysis', function () {
     $owner = User::factory()->create();
-    $admin = User::factory()->create(['role' => \App\Enums\UserRole::Admin]);
+    $admin = User::factory()->create(['role' => UserRole::Admin]);
     $sound = Sound::factory()->create(['user_id' => $owner->id]);
     SoundAnalysis::factory()->create([
         'sound_id' => $sound->id,

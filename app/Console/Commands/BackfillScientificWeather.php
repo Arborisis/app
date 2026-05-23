@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Models\Sound;
 use App\Models\ListeningPoint;
+use App\Models\Sound;
 use App\Services\Scientific\OpenMeteoEnvironmentalDataService;
 use Illuminate\Console\Command;
 
@@ -33,11 +33,11 @@ class BackfillScientificWeather extends Command
         $sounds = collect();
         if ($scope === 'sounds' || $scope === 'all') {
             $soundQuery = Sound::public()
-            ->with(['soundLocation', 'environmentalObservation'])
-            ->whereNotNull('recorded_at')
-            ->whereHas('soundLocation', fn ($q) => $q
-                ->whereNotNull('public_latitude')
-                ->whereNotNull('public_longitude'));
+                ->with(['soundLocation', 'environmentalObservation'])
+                ->whereNotNull('recorded_at')
+                ->whereHas('soundLocation', fn ($q) => $q
+                    ->whereNotNull('public_latitude')
+                    ->whereNotNull('public_longitude'));
 
             if (! $force) {
                 $soundQuery->whereDoesntHave('environmentalObservation', fn ($q) => $q->where('source', 'like', '%open-meteo%'));

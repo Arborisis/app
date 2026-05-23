@@ -15,8 +15,7 @@ class NearbyInteractionController extends Controller
 {
     public function __construct(
         private readonly NearbyInteractionService $service,
-    ) {
-    }
+    ) {}
 
     public function greet(Request $request, User $user): JsonResponse
     {

@@ -15,11 +15,17 @@ use Filament\Tables\Table;
 class NewsletterSubscriberResource extends Resource
 {
     protected static ?string $model = NewsletterSubscriber::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-users';
+
     protected static ?string $navigationLabel = 'Abonnés newsletter';
+
     protected static ?string $modelLabel = 'Abonné';
+
     protected static ?string $pluralModelLabel = 'Abonnés';
+
     protected static ?string $navigationGroup = 'Communication';
+
     protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
@@ -94,6 +100,7 @@ class NewsletterSubscriberResource extends Resource
                         ->icon('heroicon-o-arrow-down-tray')
                         ->action(function ($records) {
                             $activeEmails = $records->filter->isActive()->pluck('email')->implode("\n");
+
                             return response()->streamDownload(function () use ($activeEmails) {
                                 echo $activeEmails;
                             }, 'abonnes-actifs.txt');

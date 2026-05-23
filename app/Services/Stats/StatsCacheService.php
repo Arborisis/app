@@ -7,6 +7,7 @@ namespace App\Services\Stats;
 use App\Enums\StatCategory;
 use App\Models\Stat;
 use App\Services\Scientific\ScientificStatsService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 
 class StatsCacheService
@@ -40,7 +41,7 @@ class StatsCacheService
     /**
      * Get multiple stats at once.
      *
-     * @param array<int, string> $keys
+     * @param  array<int, string>  $keys
      * @return array<string, array<string, mixed>|null>
      */
     public function getMany(array $keys): array
@@ -143,7 +144,7 @@ class StatsCacheService
     /**
      * Get the last calculated time for a stat.
      */
-    public function lastCalculatedAt(string $key): ?\Carbon\Carbon
+    public function lastCalculatedAt(string $key): ?Carbon
     {
         $stat = Stat::key($key)->first();
 

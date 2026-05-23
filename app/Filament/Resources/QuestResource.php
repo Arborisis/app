@@ -17,10 +17,15 @@ use Filament\Tables\Table;
 class QuestResource extends Resource
 {
     protected static ?string $model = Quest::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-map';
+
     protected static ?string $navigationLabel = 'Quêtes';
+
     protected static ?string $modelLabel = 'Quête';
+
     protected static ?string $pluralModelLabel = 'Quêtes';
+
     protected static ?string $navigationGroup = 'Gamification';
 
     public static function form(Form $form): Form

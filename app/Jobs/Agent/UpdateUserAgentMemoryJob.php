@@ -23,8 +23,8 @@ class UpdateUserAgentMemoryJob implements ShouldQueue
     public int $timeout = 120;
 
     /**
-     * @param array<int, array{role?: string, content?: string}> $history
-     * @param array<string, mixed> $page
+     * @param  array<int, array{role?: string, content?: string}>  $history
+     * @param  array<string, mixed>  $page
      */
     public function __construct(
         public readonly int $userId,

@@ -9,7 +9,6 @@ use App\Events\AudioAnalysisCompleted;
 use App\Models\BirdnetDetection;
 use App\Models\Sound;
 use App\Models\SoundAnalysis;
-use App\Models\SoundFile;
 use App\Services\Scientific\ListeningPointService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -21,10 +20,11 @@ class AudioAnalysisCallbackService
         private readonly ListeningPointService $listeningPointService,
         private readonly BirdnetTagSyncService $tagSyncService,
     ) {}
+
     /**
      * Traite le callback du service Python Analyzer.
      *
-     * @param array<string, mixed> $payload
+     * @param  array<string, mixed>  $payload
      */
     public function handle(array $payload): SoundAnalysis
     {
@@ -58,7 +58,7 @@ class AudioAnalysisCallbackService
     }
 
     /**
-     * @param array<string, mixed> $results
+     * @param  array<string, mixed>  $results
      */
     private function processCompleted(SoundAnalysis $analysis, Sound $sound, array $results): void
     {
@@ -137,7 +137,7 @@ class AudioAnalysisCallbackService
     }
 
     /**
-     * @param array<int, array<string, mixed>> $detections
+     * @param  array<int, array<string, mixed>>  $detections
      */
     private function syncBirdnetDetections(SoundAnalysis $analysis, Sound $sound, array $detections): void
     {

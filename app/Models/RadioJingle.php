@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\RadioJinglePlacement;
+use App\Services\Storage\SignedUrlService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -51,7 +52,7 @@ class RadioJingle extends Model
         }
 
         if ($this->disk === 'r2') {
-            return app(\App\Services\Storage\SignedUrlService::class)->url($this->disk, $this->path, 30);
+            return app(SignedUrlService::class)->url($this->disk, $this->path, 30);
         }
 
         return Storage::disk($this->disk)->url($this->path);

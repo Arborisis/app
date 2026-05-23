@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Jobs\OpenSearch\IndexSoundInOpenSearch;
+use App\Models\ListeningPoint;
 use App\Models\Sound;
 use App\Services\OpenSearch\OpenSearchIndexService;
 use Illuminate\Console\Command;
@@ -14,12 +15,14 @@ class OpenSearchReindex extends Command
     protected $signature = 'search:reindex
                             {--sounds : Reindex all sounds}
                             {--listening-points : Reindex all listening points}';
+
     protected $description = 'Reindex all data into OpenSearch';
 
     public function handle(OpenSearchIndexService $service): int
     {
         if (! $service->isAvailable()) {
             $this->error('OpenSearch is not available.');
+
             return self::FAILURE;
         }
 
@@ -57,12 +60,12 @@ class OpenSearchReindex extends Command
 
     private function reindexListeningPoints(OpenSearchIndexService $service): void
     {
-        $count = \App\Models\ListeningPoint::approved()->count();
+        $count = ListeningPoint::approved()->count();
         $this->info("Reindexing {$count} listening points...");
 
         $progress = $this->output->createProgressBar($count);
 
-        \App\Models\ListeningPoint::approved()->chunkById(100, function ($points) use ($progress, $service) {
+        ListeningPoint::approved()->chunkById(100, function ($points) use ($progress, $service) {
             foreach ($points as $point) {
                 $service->indexListeningPoint($point);
                 $progress->advance();

@@ -19,6 +19,7 @@ use Illuminate\Validation\ValidationException;
 class XenoCantoSubmissionService
 {
     private const UPLOAD_URL = 'https://xeno-canto.org/upload';
+
     private const AUDIO_URL_TTL_MINUTES = 120;
 
     public function __construct(

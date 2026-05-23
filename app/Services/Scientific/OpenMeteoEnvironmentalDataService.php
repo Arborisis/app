@@ -226,8 +226,7 @@ class OpenMeteoEnvironmentalDataService
     }
 
     /**
-     * @param array<string, mixed> $logContext
-     *
+     * @param  array<string, mixed>  $logContext
      * @return array{endpoint: string|null, hourly: array<string, mixed>}
      */
     private function fetchWeather(float $latitude, float $longitude, CarbonInterface $observedAt, array $logContext = []): array
@@ -277,8 +276,7 @@ class OpenMeteoEnvironmentalDataService
     }
 
     /**
-     * @param array<string, mixed> $payload
-     *
+     * @param  array<string, mixed>  $payload
      * @return array<string, mixed>
      */
     private function closestHourlyObservation(array $payload, CarbonInterface $recordedAt): array

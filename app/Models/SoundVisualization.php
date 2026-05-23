@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\FrequencyScale;
 use App\Enums\SpectrogramType;
+use App\Services\Storage\SignedUrlService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -42,7 +43,7 @@ class SoundVisualization extends Model
         }
 
         if ($this->disk === 'r2') {
-            return app(\App\Services\Storage\SignedUrlService::class)->url($this->disk, $this->file_path);
+            return app(SignedUrlService::class)->url($this->disk, $this->file_path);
         }
 
         if ($this->disk === 'audio' || $this->disk === 's3') {

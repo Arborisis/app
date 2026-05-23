@@ -97,7 +97,7 @@ it('renders all custom mail templates with Arborisis branding', function () {
         (new ContactTicketReplied($ticket, 'Merci pour votre message, nous revenons vers vous.'))->render(),
         (new NewsletterWelcomeMail($subscriber))->render(),
         (new NewsletterCampaignMail($campaign, $subscriber))->render(),
-        (new VerifyEmailNotification())->toMail($user)->render(),
+        (new VerifyEmailNotification)->toMail($user)->render(),
         (new ResetPasswordNotification('reset-token'))->toMail($user)->render(),
     ];
 

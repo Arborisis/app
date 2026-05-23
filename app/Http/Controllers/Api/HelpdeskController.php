@@ -20,8 +20,7 @@ class HelpdeskController extends Controller
     public function __construct(
         private readonly HelpdeskService $helpdeskService,
         private readonly IaSuggestionService $iaSuggestionService,
-    ) {
-    }
+    ) {}
 
     public function index(): JsonResponse
     {

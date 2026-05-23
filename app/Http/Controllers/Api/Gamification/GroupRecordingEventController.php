@@ -14,8 +14,7 @@ class GroupRecordingEventController extends Controller
 {
     public function __construct(
         private readonly GeoValidationService $geoService,
-    ) {
-    }
+    ) {}
 
     public function store(Request $request): JsonResponse
     {

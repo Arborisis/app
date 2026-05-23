@@ -6,6 +6,7 @@ namespace Database\Factories;
 
 use App\Models\HelpdeskCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 class HelpdeskCategoryFactory extends Factory
 {
@@ -16,7 +17,7 @@ class HelpdeskCategoryFactory extends Factory
         $name = fake()->unique()->words(2, true);
 
         return [
-            'slug' => \Illuminate\Support\Str::slug($name),
+            'slug' => Str::slug($name),
             'name' => ucfirst($name),
             'description' => fake()->sentence(),
             'color' => fake()->randomElement(['emerald', 'cyan', 'amber', 'red', 'firefly']),

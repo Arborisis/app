@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Radio;
 
+use App\Models\RadioPodcast;
 use App\Models\Sound;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -11,8 +12,11 @@ use Illuminate\Support\Facades\Cache;
 class RadioStateService
 {
     public const CACHE_KEY_NOW_PLAYING = 'radio:engine:now-playing';
+
     public const CACHE_KEY_HISTORY = 'radio:engine:history';
+
     public const CACHE_KEY_STATUS = 'radio:engine:status';
+
     public const CACHE_KEY_RELOAD_REQUESTED_AT = 'radio:engine:reload-requested-at';
 
     public function current(?RadioStreamService $fallback = null): ?array
@@ -77,7 +81,7 @@ class RadioStateService
             : null;
 
         $podcast = isset($payload['podcast_id'])
-            ? \App\Models\RadioPodcast::find($payload['podcast_id'])
+            ? RadioPodcast::find($payload['podcast_id'])
             : null;
 
         $kind = $payload['kind'] ?? 'sound';

@@ -43,7 +43,7 @@ class RadioPodcastFactory extends Factory
             'status' => RadioPodcastStatus::Published,
             'published_at' => now(),
             'actual_duration_seconds' => 150,
-            'path' => 'podcasts/' . $this->faker->uuid() . '.mp3',
+            'path' => 'podcasts/'.$this->faker->uuid().'.mp3',
         ]);
     }
 }

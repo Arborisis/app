@@ -9,7 +9,6 @@ use App\Models\ListeningPoint;
 use App\Models\ScientificMetric;
 use App\Models\Sound;
 use App\Models\SoundAnalysis;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class ScientificMetricService
@@ -347,7 +346,7 @@ class ScientificMetricService
     }
 
     /**
-     * @param array<int, array{0: int|float, 1: int|float}> $points
+     * @param  array<int, array{0: int|float, 1: int|float}>  $points
      */
     private function linearRegressionSlope(array $points): float
     {
@@ -370,7 +369,7 @@ class ScientificMetricService
     }
 
     /**
-     * @param array<int, float> $values
+     * @param  array<int, float>  $values
      */
     private function std(array $values): float
     {
@@ -386,7 +385,7 @@ class ScientificMetricService
     }
 
     /**
-     * @param array<int, int> $counts
+     * @param  array<int, int>  $counts
      */
     private function shannonDiversity(array $counts): float
     {

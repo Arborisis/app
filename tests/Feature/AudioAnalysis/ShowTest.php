@@ -7,7 +7,7 @@ use App\Models\User;
 it('returns analysis status for authenticated user', function () {
     $user = User::factory()->create();
     $sound = Sound::factory()->create(['user_id' => $user->id]);
-    \App\Models\SoundAnalysis::factory()->create([
+    SoundAnalysis::factory()->create([
         'sound_id' => $sound->id,
         'status' => 'completed',
         'duration_seconds' => 120.0,

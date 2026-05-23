@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\RadioDaypart;
 use App\Enums\SoundStatus;
 use App\Enums\SoundVisibility;
 use App\Models\RadioDjAnnouncement;
@@ -39,8 +40,8 @@ function buildDjServiceWithMocks(?array $scriptResult = null): array
     $context = Mockery::mock(RadioHostContextService::class);
     $context->shouldReceive('soundPayload')->andReturn(null)->byDefault();
 
-    $promptBuilder = new DjScriptPromptBuilder();
-    $selector = new HostPersonalitySelector();
+    $promptBuilder = new DjScriptPromptBuilder;
+    $selector = new HostPersonalitySelector;
     $generator = new DjScriptGenerator($promptBuilder, $selector, $openRouter, $context);
     $service = new RadioDjService($selector, $generator, $elevenLabs);
 
@@ -79,7 +80,7 @@ it('falls back to legacy template when personalities flag is disabled', function
         'services.elevenlabs.voice_id' => '',
     ]);
 
-    $service = new RadioDjService();
+    $service = new RadioDjService;
     $sound = makePersistedSound();
 
     $legacy = $service->legacyTemplate($sound);
@@ -203,10 +204,10 @@ it('falls back to legacy template when LLM returns null', function () {
 });
 
 it('selects different personalities for different show types', function () {
-    $selector = new HostPersonalitySelector();
+    $selector = new HostPersonalitySelector;
 
-    $djPerso = $selector->select('dj', App\Enums\RadioDaypart::Dawn);
-    $flashPerso = $selector->select('flash', App\Enums\RadioDaypart::Morning);
+    $djPerso = $selector->select('dj', RadioDaypart::Dawn);
+    $flashPerso = $selector->select('flash', RadioDaypart::Morning);
 
     expect($djPerso)->not->toBeNull();
     expect($flashPerso)->not->toBeNull();
@@ -216,7 +217,7 @@ it('selects different personalities for different show types', function () {
 
 it('avoids picking the same personality twice in a row when streak limit is reached', function () {
     config(['radio.host.dj_solo_streak_max' => 2]);
-    $selector = new HostPersonalitySelector();
+    $selector = new HostPersonalitySelector;
     $sound = makePersistedSound();
 
     // Insert 2 announcements from solene_poete back to back.
@@ -239,7 +240,7 @@ it('avoids picking the same personality twice in a row when streak limit is reac
     }
 
     // Now the selector should pick someone else for dj/dawn.
-    $next = $selector->select('dj', App\Enums\RadioDaypart::Dawn);
+    $next = $selector->select('dj', RadioDaypart::Dawn);
 
     expect($next)->not->toBeNull();
     expect($next->slug)->not->toBe('solene_poete');

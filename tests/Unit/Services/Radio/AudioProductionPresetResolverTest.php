@@ -10,7 +10,7 @@ use App\Services\Radio\Filters\SidechainBedFilter;
 use App\Services\Radio\Filters\VoiceChainFilter;
 
 it('resolves the default preset from the show type', function () {
-    $resolver = new AudioProductionPresetResolver();
+    $resolver = new AudioProductionPresetResolver;
 
     $flash = $resolver->resolve(RadioShowType::Flash->value);
     $emission = $resolver->resolve(RadioShowType::Emission);
@@ -22,7 +22,7 @@ it('resolves the default preset from the show type', function () {
 });
 
 it('prefers explicit presets over channel and show type defaults', function () {
-    $resolver = new AudioProductionPresetResolver();
+    $resolver = new AudioProductionPresetResolver;
     $channel = new RadioChannel([
         'production_preset' => RadioProductionPreset::Interlude,
     ]);
@@ -37,7 +37,7 @@ it('prefers explicit presets over channel and show type defaults', function () {
 });
 
 it('uses channel preset before show type default', function () {
-    $resolver = new AudioProductionPresetResolver();
+    $resolver = new AudioProductionPresetResolver;
     $channel = new RadioChannel([
         'production_preset' => RadioProductionPreset::Interlude,
     ]);
@@ -49,10 +49,10 @@ it('uses channel preset before show type default', function () {
 });
 
 it('builds ffmpeg filters from preset values', function () {
-    $preset = (new AudioProductionPresetResolver())->resolve(RadioShowType::Flash->value);
+    $preset = (new AudioProductionPresetResolver)->resolve(RadioShowType::Flash->value);
 
-    $voice = (new VoiceChainFilter())->build(0, $preset, ['[voice]', '[voice_sc1]']);
-    $sidechain = (new SidechainBedFilter())->build('[musicraw]', '[voice_sc1]', '[music]', $preset);
+    $voice = (new VoiceChainFilter)->build(0, $preset, ['[voice]', '[voice_sc1]']);
+    $sidechain = (new SidechainBedFilter)->build('[musicraw]', '[voice_sc1]', '[music]', $preset);
 
     expect($voice)->toContain('highpass=f=80');
     expect($voice)->toContain('asplit=2[voice][voice_sc1]');

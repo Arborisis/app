@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\Carbon;
+use Database\Factories\BirdnetDetectionFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -23,9 +25,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $source
  * @property bool $is_validated
  * @property int|null $validated_by
- * @property \Carbon\Carbon|null $created_at
- * @property \Carbon\Carbon|null $updated_at
- *
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property-read SoundAnalysis $soundAnalysis
  * @property-read Sound $sound
  * @property-read User|null $validatedBy
@@ -44,7 +45,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class BirdnetDetection extends Model
 {
-    /** @use HasFactory<\Database\Factories\BirdnetDetectionFactory> */
+    /** @use HasFactory<BirdnetDetectionFactory> */
     use HasFactory;
 
     protected $table = 'birdnet_detections';

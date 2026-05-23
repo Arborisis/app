@@ -5,19 +5,23 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Models\RadioChannel;
 use App\Models\RadioPodcast;
 use App\Models\RadioReaction;
-use App\Models\RadioChannel;
 use App\Models\RadioSchedule;
 use App\Models\RadioSetting;
+use App\Models\Sound;
 use App\Services\Radio\RadioAudioCacheService;
 use App\Services\Radio\RadioStateService;
 use App\Services\Radio\RadioStreamService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class RadioController extends Controller
 {
@@ -139,7 +143,7 @@ class RadioController extends Controller
         }, 200, $headers);
     }
 
-    public function playlist(): \Illuminate\Http\Response
+    public function playlist(): Response
     {
         $settings = RadioSetting::query()->first();
         $streamUrl = $settings?->public_stream_url ?: config('radio.public_stream_url') ?: route('radio.stream');
@@ -151,7 +155,7 @@ class RadioController extends Controller
         ]);
     }
 
-    public function nowPlaying(): \Illuminate\Http\JsonResponse
+    public function nowPlaying(): JsonResponse
     {
         $metadata = $this->stateService->current($this->streamService);
         $listenerCount = $this->streamService->getListenerCount();
@@ -174,7 +178,7 @@ class RadioController extends Controller
         ]);
     }
 
-    public function programme(Request $request): \Illuminate\Http\JsonResponse
+    public function programme(Request $request): JsonResponse
     {
         $date = $request->date('date') ?? now();
         $start = $date->copy()->startOfDay();
@@ -229,14 +233,14 @@ class RadioController extends Controller
         ]);
     }
 
-    public function channels(): \Illuminate\Http\JsonResponse
+    public function channels(): JsonResponse
     {
         return response()->json([
             'items' => $this->channelsPayload(),
         ]);
     }
 
-    public function serveCachedAudio(string $type, int $id, RadioAudioCacheService $cache): \Symfony\Component\HttpFoundation\BinaryFileResponse|\Illuminate\Http\JsonResponse
+    public function serveCachedAudio(string $type, int $id, RadioAudioCacheService $cache): BinaryFileResponse|JsonResponse
     {
         if (! in_array($type, ['sounds', 'jingles', 'podcasts', 'dj'], true)) {
             return response()->json(['error' => 'Invalid type'], 404);
@@ -263,9 +267,9 @@ class RadioController extends Controller
             return ['like' => 0, 'heart' => 0, 'leaf' => 0, 'star' => 0];
         }
 
-        $likeCount = (int) (\App\Models\Sound::query()->whereKey($soundId)->value('like_count') ?? 0);
+        $likeCount = (int) (Sound::query()->whereKey($soundId)->value('like_count') ?? 0);
 
-        if (! \Illuminate\Support\Facades\Schema::hasTable('radio_reactions')) {
+        if (! Schema::hasTable('radio_reactions')) {
             return ['like' => $likeCount, 'heart' => 0, 'leaf' => 0, 'star' => 0];
         }
 
@@ -291,7 +295,7 @@ class RadioController extends Controller
      */
     private function channelsPayload(): array
     {
-        if (! \Illuminate\Support\Facades\Schema::hasTable('radio_channels')) {
+        if (! Schema::hasTable('radio_channels')) {
             return [];
         }
 

@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\DiscordSetting;
 use App\Models\Sound;
 use App\Models\User;
 use App\Models\UserDiscordAccount;
-use App\Services\Echo\DonationService;
 use App\Services\Radio\RadioStateService;
+use App\Services\Radio\RadioStreamService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -104,7 +103,7 @@ class InternalDiscordController extends Controller
 
     public function getRadioNowPlaying(RadioStateService $radioState): JsonResponse
     {
-        $nowPlaying = $radioState->current(app(\App\Services\Radio\RadioStreamService::class));
+        $nowPlaying = $radioState->current(app(RadioStreamService::class));
 
         if (! $nowPlaying) {
             return response()->json(['error' => 'Aucune lecture en cours.'], 404);

@@ -17,6 +17,5 @@ class ArborisisPointRejected
         public ArborisisPoint $point,
         public User $admin,
         public ?string $reason = null,
-    ) {
-    }
+    ) {}
 }

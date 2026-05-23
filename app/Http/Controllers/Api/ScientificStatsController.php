@@ -118,7 +118,7 @@ class ScientificStatsController extends Controller
     }
 
     /**
-     * @param array<string|int, mixed> $data
+     * @param  array<string|int, mixed>  $data
      */
     private function scientificResponse(array $data, ScientificStatsRequest $request): JsonResponse
     {

@@ -11,12 +11,13 @@ use Illuminate\Support\Str;
 class BirdnetTagSyncService
 {
     private const MIN_CONFIDENCE = 0.70;
+
     private const MAX_TAGS = 8;
 
     /**
      * Synchronise les tags d'un son à partir des détections BirdNET.
      *
-     * @param array<int, array<string, mixed>> $detections
+     * @param  array<int, array<string, mixed>>  $detections
      */
     public function sync(Sound $sound, array $detections): void
     {
@@ -39,8 +40,7 @@ class BirdnetTagSyncService
     }
 
     /**
-     * @param array<int, array<string, mixed>> $detections
-     *
+     * @param  array<int, array<string, mixed>>  $detections
      * @return array<int, string>
      */
     private function extractTagNames(array $detections): array
@@ -75,6 +75,7 @@ class BirdnetTagSyncService
     private function normalizeName(string $name): string
     {
         $name = trim($name);
+
         // Capitalize première lettre de chaque mot
         return mb_convert_case($name, MB_CASE_TITLE, 'UTF-8');
     }

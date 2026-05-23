@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\Gamification;
 
-use App\Enums\ModerationStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Gamification\ReportPointRequest;
 use App\Http\Requests\Gamification\StoreArborisisPointRequest;
@@ -18,8 +17,7 @@ class ArborisisPointController extends Controller
 {
     public function __construct(
         private readonly ArborisisPointService $pointService,
-    ) {
-    }
+    ) {}
 
     public function index(Request $request): JsonResponse
     {

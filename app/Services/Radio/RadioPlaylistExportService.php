@@ -8,6 +8,7 @@ use App\Models\RadioJingle;
 use App\Models\RadioPodcast;
 use App\Models\Sound;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class RadioPlaylistExportService
@@ -67,7 +68,7 @@ class RadioPlaylistExportService
 
             $annotations = $this->buildAnnotations($item);
             $uri = $item['storage_url'] ?? $item['url'];
-            $lines[] = $annotations . $uri;
+            $lines[] = $annotations.$uri;
         }
 
         return implode("\n", $lines)."\n";
@@ -96,14 +97,14 @@ class RadioPlaylistExportService
 
             // Toutes les métadonnées dans l'annotation pour qu'elles survivent au lookup par filename
             $annotationParts = [
-                'kind=' . $item['kind'],
-                'title=' . $this->escapeLiqAnnotation($item['title']),
-                'artist=' . $this->escapeLiqAnnotation($item['artist'] ?? 'Arborisis'),
-                'sound_id=' . ($item['kind'] === 'sound' ? $item['id'] : ''),
-                'podcast_id=' . ($item['kind'] === 'podcast' ? ($item['podcast_id'] ?? '') : ''),
-                'show_type=' . $this->escapeLiqAnnotation($item['show_type'] ?? ''),
-                'duration=' . ($item['duration'] ?? ''),
-                'slug=' . $this->escapeLiqAnnotation($item['slug'] ?? ''),
+                'kind='.$item['kind'],
+                'title='.$this->escapeLiqAnnotation($item['title']),
+                'artist='.$this->escapeLiqAnnotation($item['artist'] ?? 'Arborisis'),
+                'sound_id='.($item['kind'] === 'sound' ? $item['id'] : ''),
+                'podcast_id='.($item['kind'] === 'podcast' ? ($item['podcast_id'] ?? '') : ''),
+                'show_type='.$this->escapeLiqAnnotation($item['show_type'] ?? ''),
+                'duration='.($item['duration'] ?? ''),
+                'slug='.$this->escapeLiqAnnotation($item['slug'] ?? ''),
             ];
 
             $annotationEntries[] = sprintf('"annotate:%s:%s"', implode(',', $annotationParts), $uri);
@@ -111,10 +112,10 @@ class RadioPlaylistExportService
 
         $lines = [];
         $lines[] = 'playlist_meta_lookup = [';
-        $lines[] = '  ' . implode(",\n  ", $metaEntries);
+        $lines[] = '  '.implode(",\n  ", $metaEntries);
         $lines[] = ']';
         $lines[] = '';
-        $lines[] = 'playlist_annotations = [' . implode(', ', $annotationEntries) . ']';
+        $lines[] = 'playlist_annotations = ['.implode(', ', $annotationEntries).']';
         $lines[] = '';
         $lines[] = 'playlist_index = ref(0)';
         $lines[] = '';
@@ -129,7 +130,7 @@ class RadioPlaylistExportService
         $lines[] = '  end';
         $lines[] = 'end';
 
-        return implode("\n", $lines) . "\n";
+        return implode("\n", $lines)."\n";
     }
 
     private function escapeLiq(string $value): string
@@ -147,7 +148,7 @@ class RadioPlaylistExportService
      * Résout l'URL publique de stockage (R2, S3...) pour un fichier audio.
      * Liquidsoap l'utilisera directement sans cache local.
      *
-     * @param array{disk: string, path: string} $source
+     * @param  array{disk: string, path: string}  $source
      */
     private function resolveStorageUrl(array $source): string
     {
@@ -300,14 +301,14 @@ class RadioPlaylistExportService
     private function buildAnnotations(array $item): string
     {
         $parts = [];
-        $parts[] = 'duration=' . ($item['duration'] ?? '');
-        $parts[] = 'sound_id=' . ($item['kind'] === 'sound' ? ($item['id'] ?? '') : '');
-        $parts[] = 'slug=' . ($item['slug'] ?? '');
-        $parts[] = 'kind=' . ($item['kind'] ?? 'sound');
-        $parts[] = 'podcast_id=' . ($item['kind'] === 'podcast' ? ($item['podcast_id'] ?? '') : '');
-        $parts[] = 'show_type=' . ($item['show_type'] ?? '');
+        $parts[] = 'duration='.($item['duration'] ?? '');
+        $parts[] = 'sound_id='.($item['kind'] === 'sound' ? ($item['id'] ?? '') : '');
+        $parts[] = 'slug='.($item['slug'] ?? '');
+        $parts[] = 'kind='.($item['kind'] ?? 'sound');
+        $parts[] = 'podcast_id='.($item['kind'] === 'podcast' ? ($item['podcast_id'] ?? '') : '');
+        $parts[] = 'show_type='.($item['show_type'] ?? '');
 
-        return 'annotate:' . implode(',', $parts) . ':';
+        return 'annotate:'.implode(',', $parts).':';
     }
 
     private function ensureCached(string $type, int $id, callable $warmer): void
@@ -317,7 +318,7 @@ class RadioPlaylistExportService
                 $warmer();
             } catch (\Throwable $e) {
                 // Log but don't break playlist generation; Liquidsoap will skip if file missing
-                \Illuminate\Support\Facades\Log::warning('Playlist cache warm failed', [
+                Log::warning('Playlist cache warm failed', [
                     'type' => $type,
                     'id' => $id,
                     'error' => $e->getMessage(),

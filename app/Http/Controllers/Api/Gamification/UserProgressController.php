@@ -13,8 +13,7 @@ class UserProgressController extends Controller
 {
     public function __construct(
         private readonly XpService $xpService,
-    ) {
-    }
+    ) {}
 
     public function progress(Request $request): JsonResponse
     {

@@ -10,12 +10,14 @@ use Illuminate\Console\Command;
 class OpenSearchCreateIndices extends Command
 {
     protected $signature = 'search:create-indices';
+
     protected $description = 'Create OpenSearch indices with mappings';
 
     public function handle(OpenSearchIndexService $service): int
     {
         if (! $service->isAvailable()) {
             $this->error('OpenSearch is not available.');
+
             return self::FAILURE;
         }
 

@@ -7,7 +7,7 @@ use App\Models\RadioListenerSession;
 use App\Services\Radio\ListenerSessionTracker;
 
 it('starts heartbeats closes and expires listener sessions', function () {
-    $tracker = new ListenerSessionTracker();
+    $tracker = new ListenerSessionTracker;
 
     $session = $tracker->start('listener-1', ['ip' => '127.0.0.1', 'user_agent' => 'test']);
 

@@ -18,6 +18,7 @@ class IndexSoundInOpenSearch implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 3;
+
     public $backoff = [30, 120, 300];
 
     public function __construct(private readonly int $soundId) {}
@@ -34,6 +35,7 @@ class IndexSoundInOpenSearch implements ShouldQueue
 
         if (! $sound->isPublic()) {
             $service->deleteSound($sound->id);
+
             return;
         }
 

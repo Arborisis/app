@@ -6,12 +6,11 @@ namespace App\Http\Controllers\Api\SoundIdeas;
 
 use App\Enums\SoundIdeaStatus;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\SoundIdeas\UpdateSoundIdeaRequest;
 use App\Models\DailySoundIdea;
+use App\Models\User;
 use App\Models\UserSoundIdeaProgress;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class DailySoundIdeaController extends Controller
 {
@@ -119,7 +118,7 @@ class DailySoundIdeaController extends Controller
         ]);
     }
 
-    private function getCompletedCount(\App\Models\User $user): int
+    private function getCompletedCount(User $user): int
     {
         return UserSoundIdeaProgress::where('user_id', $user->id)
             ->where('status', SoundIdeaStatus::Completed)

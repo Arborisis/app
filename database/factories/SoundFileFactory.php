@@ -16,9 +16,9 @@ class SoundFileFactory extends Factory
     {
         return [
             'sound_id' => Sound::factory(),
-            'original_name' => fake()->word() . '.wav',
-            'stored_name' => fake()->uuid() . '.wav',
-            'path' => 'audio/1/' . fake()->uuid() . '.wav',
+            'original_name' => fake()->word().'.wav',
+            'stored_name' => fake()->uuid().'.wav',
+            'path' => 'audio/1/'.fake()->uuid().'.wav',
             'mime_type' => 'audio/wav',
             'size_bytes' => fake()->numberBetween(100000, 10000000),
             'disk' => 'audio',

@@ -87,6 +87,7 @@ class AchievementService
     {
         if (isset($payload['field'])) {
             $field = $payload['field'];
+
             return ! empty($user->{$field});
         }
 

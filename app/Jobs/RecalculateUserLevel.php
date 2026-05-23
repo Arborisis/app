@@ -16,9 +16,7 @@ class RecalculateUserLevel implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(public int $userId)
-    {
-    }
+    public function __construct(public int $userId) {}
 
     public function handle(): void
     {

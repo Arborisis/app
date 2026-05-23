@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 class UserAgentMemoryService
 {
     private const CONVERSATION_NOTES_FILE = 'CONVERSATION_NOTES.json';
+
     private const MAX_CONVERSATION_NOTES = 12;
 
     /**
@@ -205,8 +206,8 @@ MARKDOWN;
     }
 
     /**
-     * @param array<int, array{role?: string, content?: string}> $history
-     * @param array<string, mixed> $page
+     * @param  array<int, array{role?: string, content?: string}>  $history
+     * @param  array<string, mixed>  $page
      */
     public function rememberConversation(User $user, string $message, string $answer, array $history = [], array $page = []): void
     {
@@ -353,7 +354,7 @@ MARKDOWN;
     }
 
     /**
-     * @param Collection<int, Sound> $sounds
+     * @param  Collection<int, Sound>  $sounds
      */
     private function fieldRecordingProfile(Collection $sounds): string
     {
@@ -380,7 +381,7 @@ MARKDOWN;
     }
 
     /**
-     * @param Collection<int, Sound> $sounds
+     * @param  Collection<int, Sound>  $sounds
      */
     private function metadataGaps(Collection $sounds): string
     {
@@ -406,7 +407,7 @@ MARKDOWN;
     }
 
     /**
-     * @param Collection<int, Sound> $sounds
+     * @param  Collection<int, Sound>  $sounds
      */
     private function nextActions(User $user, Collection $sounds): string
     {
@@ -436,7 +437,7 @@ MARKDOWN;
     }
 
     /**
-     * @param Collection<string, int> $counts
+     * @param  Collection<string, int>  $counts
      */
     private function countSummary(Collection $counts, string $empty): string
     {

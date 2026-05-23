@@ -13,6 +13,7 @@ use App\Models\Quest;
 use App\Models\Sound;
 use App\Models\User;
 use App\Services\AI\OpenRouterService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class AiQuestGeneratorService
@@ -197,7 +198,7 @@ class AiQuestGeneratorService
         ];
     }
 
-    private function seasonLabel(\Carbon\Carbon $date): string
+    private function seasonLabel(Carbon $date): string
     {
         $month = (int) $date->format('n');
 

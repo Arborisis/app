@@ -16,7 +16,7 @@ class RadioConversionService
 
     public function convert(SoundFile $soundFile): bool
     {
-        if (!$this->isConvertible($soundFile)) {
+        if (! $this->isConvertible($soundFile)) {
             Log::info('Radio conversion skipped: not convertible', ['sound_file_id' => $soundFile->id]);
 
             return false;
@@ -30,12 +30,12 @@ class RadioConversionService
 
         $disk = $soundFile->disk;
         $originalPath = $soundFile->path;
-        $tempOriginal = sys_get_temp_dir() . '/' . Str::uuid() . '_' . basename($originalPath);
-        $tempConverted = sys_get_temp_dir() . '/' . Str::uuid() . '_radio.mp3';
+        $tempOriginal = sys_get_temp_dir().'/'.Str::uuid().'_'.basename($originalPath);
+        $tempConverted = sys_get_temp_dir().'/'.Str::uuid().'_radio.mp3';
 
         try {
             $stream = Storage::disk($disk)->readStream($originalPath);
-            if (!$stream) {
+            if (! $stream) {
                 throw new \RuntimeException('Cannot open original file stream');
             }
 
@@ -72,7 +72,7 @@ class RadioConversionService
             $process->setTimeout(300);
             $process->run();
 
-            if (!$process->isSuccessful()) {
+            if (! $process->isSuccessful()) {
                 Log::error('FFmpeg radio conversion failed', [
                     'sound_file_id' => $soundFile->id,
                     'error' => $process->getErrorOutput(),
@@ -125,6 +125,6 @@ class RadioConversionService
         $dir = dirname($soundFile->path);
         $uuid = Str::uuid()->toString();
 
-        return $dir . '/' . $uuid . '_radio.mp3';
+        return $dir.'/'.$uuid.'_radio.mp3';
     }
 }

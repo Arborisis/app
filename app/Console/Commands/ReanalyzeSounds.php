@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Enums\AnalysisStatus;
 use App\Jobs\RequestAudioAnalysis;
 use App\Models\Sound;
 use App\Models\SoundAnalysis;
@@ -35,6 +36,7 @@ class ReanalyzeSounds extends Command
 
         if ($total === 0) {
             $this->warn('Aucun son à analyser.');
+
             return self::SUCCESS;
         }
 
@@ -58,7 +60,7 @@ class ReanalyzeSounds extends Command
                 // Force re-create as pending to ensure re-analysis
                 SoundAnalysis::updateOrCreate(
                     ['sound_id' => $sound->id],
-                    ['status' => \App\Enums\AnalysisStatus::PENDING, 'failed_reason' => null]
+                    ['status' => AnalysisStatus::PENDING, 'failed_reason' => null]
                 );
 
                 $r2Key = $sound->soundFile?->path ?? "sounds/original/{$sound->id}/audio";

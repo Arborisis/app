@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 class OpenRouterAgentService
 {
     private const COMPACTION_THRESHOLD = 8;
+
     private const COMPACTION_KEEP_RECENT = 4;
 
     private ?User $currentUser = null;

@@ -20,6 +20,7 @@ class RequestAudioAnalysis implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $tries = 3;
+
     public int $timeout = 180;
 
     public function __construct(
@@ -155,6 +156,7 @@ class RequestAudioAnalysis implements ShouldQueue
 
     /**
      * @template T
+     *
      * @param  array<T>  $array
      * @return array<T>
      */

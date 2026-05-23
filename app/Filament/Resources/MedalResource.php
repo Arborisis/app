@@ -17,10 +17,15 @@ use Filament\Tables\Table;
 class MedalResource extends Resource
 {
     protected static ?string $model = Medal::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-star';
+
     protected static ?string $navigationLabel = 'Médailles';
+
     protected static ?string $modelLabel = 'Médaille';
+
     protected static ?string $pluralModelLabel = 'Médailles';
+
     protected static ?string $navigationGroup = 'Gamification';
 
     public static function form(Form $form): Form

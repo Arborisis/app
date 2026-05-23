@@ -7,13 +7,13 @@ namespace App\Services\Gamification;
 use App\Models\ArborisisPoint;
 use App\Models\ArborisisVisit;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
 
 class AntiCheatService
 {
     private const COOLDOWN_KEY_PREFIX = 'arborisis:cooldown:';
+
     private const DAILY_COUNT_KEY_PREFIX = 'arborisis:daily_visits:';
 
     public function validateVisit(
@@ -79,14 +79,14 @@ class AntiCheatService
     public function recordVisit(User $user, int $pointId): void
     {
         $cooldownSeconds = config('gamification.visit_cooldown', 3600);
-        $redisKey = self::COOLDOWN_KEY_PREFIX . "{$user->id}:{$pointId}";
+        $redisKey = self::COOLDOWN_KEY_PREFIX."{$user->id}:{$pointId}";
         if (app()->environment('testing')) {
             Cache::put($redisKey, '1', $cooldownSeconds);
         } else {
             Redis::setex($redisKey, $cooldownSeconds, '1');
         }
 
-        $dailyKey = self::DAILY_COUNT_KEY_PREFIX . $user->id . ':' . now()->format('Y-m-d');
+        $dailyKey = self::DAILY_COUNT_KEY_PREFIX.$user->id.':'.now()->format('Y-m-d');
         if (app()->environment('testing')) {
             Cache::put($dailyKey, ((int) Cache::get($dailyKey, 0)) + 1, 86400);
         } else {
@@ -97,7 +97,7 @@ class AntiCheatService
 
     public function isCooldownActive(int $userId, int $pointId): bool
     {
-        $redisKey = self::COOLDOWN_KEY_PREFIX . "{$userId}:{$pointId}";
+        $redisKey = self::COOLDOWN_KEY_PREFIX."{$userId}:{$pointId}";
 
         if (app()->environment('testing')) {
             return Cache::has($redisKey);
@@ -108,7 +108,7 @@ class AntiCheatService
 
     public function isDailyLimitReached(int $userId): bool
     {
-        $dailyKey = self::DAILY_COUNT_KEY_PREFIX . $userId . ':' . now()->format('Y-m-d');
+        $dailyKey = self::DAILY_COUNT_KEY_PREFIX.$userId.':'.now()->format('Y-m-d');
         $count = app()->environment('testing')
             ? (int) Cache::get($dailyKey, 0)
             : (int) Redis::get($dailyKey);
@@ -150,7 +150,7 @@ class AntiCheatService
 
     public function getCooldownRemaining(int $userId, int $pointId): int
     {
-        $redisKey = self::COOLDOWN_KEY_PREFIX . "{$userId}:{$pointId}";
+        $redisKey = self::COOLDOWN_KEY_PREFIX."{$userId}:{$pointId}";
         if (app()->environment('testing')) {
             return Cache::has($redisKey) ? (int) config('gamification.visit_cooldown', 3600) : 0;
         }

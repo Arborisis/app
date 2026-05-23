@@ -17,7 +17,7 @@ class ArborisisPointModerationService
 {
     public function approve(ArborisisPoint $point, User $admin, ?string $notes = null): ArborisisPoint
     {
-        return DB::transaction(function () use ($point, $admin, $notes) {
+        return DB::transaction(function () use ($point, $admin) {
             $coordinates = ArborisisPoint::publicCoordinates(
                 (float) $point->latitude,
                 (float) $point->longitude,
@@ -53,7 +53,7 @@ class ArborisisPointModerationService
 
     public function hide(ArborisisPoint $point, User $admin, ?string $reason = null): ArborisisPoint
     {
-        return DB::transaction(function () use ($point, $admin, $reason) {
+        return DB::transaction(function () use ($point) {
             $point->update([
                 'moderation_status' => ModerationStatus::Hidden,
             ]);
@@ -64,7 +64,7 @@ class ArborisisPointModerationService
 
     public function archive(ArborisisPoint $point, User $admin): ArborisisPoint
     {
-        return DB::transaction(function () use ($point, $admin) {
+        return DB::transaction(function () use ($point) {
             $point->update([
                 'moderation_status' => ModerationStatus::Archived,
             ]);

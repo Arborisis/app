@@ -6,15 +6,17 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Sound\StoreSoundRequest;
+use App\Jobs\TrackSoundListen;
 use App\Models\Category;
 use App\Models\Environment;
 use App\Models\ListeningPoint;
 use App\Models\Sound;
-use App\Models\SoundAnalysis;
 use App\Services\AudioAnalysis\AudioAnalysisOrchestrationService;
 use App\Services\Sound\SoundUploadService;
+use App\Services\Storage\SignedUrlService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -50,11 +52,11 @@ class SoundController extends Controller
 
         // Increment play count via cache counter for performance
         $cacheKey = "sound:plays:{$sound->id}";
-        $playCount = \Illuminate\Support\Facades\Cache::increment($cacheKey);
+        $playCount = Cache::increment($cacheKey);
 
         // Batch update play count every 10 plays or randomly with 5% chance
         if ($playCount >= 10 || random_int(1, 20) === 1) {
-            \Illuminate\Support\Facades\Cache::put($cacheKey, 0);
+            Cache::put($cacheKey, 0);
             $sound->increment('play_count', $playCount);
         }
 
@@ -63,7 +65,7 @@ class SoundController extends Controller
             $user = auth()->user();
             $listenedSeconds = $sound->duration ?? 0;
 
-            \App\Jobs\TrackSoundListen::dispatch($user->id, $sound->id, $listenedSeconds);
+            TrackSoundListen::dispatch($user->id, $sound->id, $listenedSeconds);
         }
 
         // Get audio URL
@@ -159,7 +161,7 @@ class SoundController extends Controller
         $storage = Storage::disk($disk);
 
         if ($disk === 'r2') {
-            return app(\App\Services\Storage\SignedUrlService::class)->url($disk, $path);
+            return app(SignedUrlService::class)->url($disk, $path);
         }
 
         if ($disk === 'audio' || $disk === 's3') {

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\Gamification;
 
-use App\Enums\ModerationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\ArborisisPoint;
 use App\Models\PointReport;
@@ -17,8 +16,7 @@ class AdminArborisisPointController extends Controller
 {
     public function __construct(
         private readonly ArborisisPointModerationService $moderationService,
-    ) {
-    }
+    ) {}
 
     public function pending(Request $request): JsonResponse
     {

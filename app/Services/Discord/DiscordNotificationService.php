@@ -52,7 +52,7 @@ class DiscordNotificationService
             content: "👋 Bienvenue à **{$user->name}** sur Arborisis !",
             embed: [
                 'title' => 'Nouveau membre',
-                'description' => "Rejoignez-le sur son profil : " . route('profile.show', $user->slug, absolute: true),
+                'description' => 'Rejoignez-le sur son profil : '.route('profile.show', $user->slug, absolute: true),
                 'color' => 0x4ADE80,
                 'timestamp' => now()->toIso8601String(),
             ]
@@ -94,7 +94,7 @@ class DiscordNotificationService
 
         $reportableTitle = match ($report->reportable_type) {
             'App\Models\Sound' => $report->reportable->title ?? 'Son supprimé',
-            'App\Models\Comment' => 'Commentaire #' . $report->reportable->id,
+            'App\Models\Comment' => 'Commentaire #'.$report->reportable->id,
             default => 'Contenu',
         };
 

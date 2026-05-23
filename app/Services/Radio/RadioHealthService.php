@@ -7,6 +7,7 @@ namespace App\Services\Radio;
 use App\Models\RadioGenerationJob;
 use App\Models\RadioPodcast;
 use App\Services\CircuitBreaker;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
@@ -63,7 +64,7 @@ class RadioHealthService
         $lastSeen = is_array($status) ? ($status['last_seen_at'] ?? null) : null;
 
         return [
-            'ok' => $lastSeen !== null && now()->diffInMinutes(\Carbon\Carbon::parse($lastSeen)) < 5,
+            'ok' => $lastSeen !== null && now()->diffInMinutes(Carbon::parse($lastSeen)) < 5,
             'last_seen_at' => $lastSeen,
             'source' => is_array($status) ? ($status['source'] ?? null) : null,
         ];

@@ -2,28 +2,40 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\Api\HealthController;
-use App\Http\Controllers\Api\HealthRadioController;
-use App\Http\Controllers\Api\HelpdeskController;
+use App\Http\Controllers\Api\Agent\AgentActionController;
 use App\Http\Controllers\Api\Agent\AgentChatStatusController;
 use App\Http\Controllers\Api\Agent\ChatAgentController;
-use App\Http\Controllers\Api\Internal\WikiOAuthController;
+use App\Http\Controllers\Api\BlogController as ApiBlogController;
+use App\Http\Controllers\Api\FeaturedController;
 use App\Http\Controllers\Api\Gamification\AchievementController;
 use App\Http\Controllers\Api\Gamification\AdminArborisisPointController;
+use App\Http\Controllers\Api\Gamification\AdminSoundWalkController;
 use App\Http\Controllers\Api\Gamification\ArborisisPointController;
 use App\Http\Controllers\Api\Gamification\ArborisisVisitController;
-use App\Http\Controllers\Api\Gamification\MedalController;
 use App\Http\Controllers\Api\Gamification\GroupRecordingEventController;
+use App\Http\Controllers\Api\Gamification\MedalController;
 use App\Http\Controllers\Api\Gamification\NearbyInteractionController;
 use App\Http\Controllers\Api\Gamification\PresenceController;
 use App\Http\Controllers\Api\Gamification\QuestController;
+use App\Http\Controllers\Api\Gamification\SoundWalkController;
 use App\Http\Controllers\Api\Gamification\UserProgressController;
-use App\Http\Controllers\Api\BlogController as ApiBlogController;
+use App\Http\Controllers\Api\HealthController;
+use App\Http\Controllers\Api\HealthRadioController;
+use App\Http\Controllers\Api\HelpdeskController;
 use App\Http\Controllers\Api\InboundContactTicketReplyController;
+use App\Http\Controllers\Api\Internal\WikiOAuthController;
+use App\Http\Controllers\Api\InternalAudioAnalysisController;
+use App\Http\Controllers\Api\InternalDiscordController;
+use App\Http\Controllers\Api\InternalRadioController;
 use App\Http\Controllers\Api\MapController;
+use App\Http\Controllers\Api\ScientificStatsController;
 use App\Http\Controllers\Api\SoundIdeas\DailySoundIdeaController;
-use App\Http\Controllers\Web\RadioController;
 use App\Http\Controllers\RadioInteractionController;
+use App\Http\Controllers\Web\AudioAnalysisController;
+use App\Http\Controllers\Web\RadioController;
+use App\Http\Middleware\AuthenticateInternalBot;
+use App\Http\Middleware\VerifyInternalApiToken;
+use App\Http\Middleware\VerifyRadioInternalToken;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -43,17 +55,17 @@ Route::get('/ai-agent/status/{jobId}', AgentChatStatusController::class)
 Route::middleware(['web', 'auth', 'throttle:agent-action'])
     ->prefix('agent/actions')
     ->group(function () {
-        Route::post('/create-point', [\App\Http\Controllers\Api\Agent\AgentActionController::class, 'createPoint'])
+        Route::post('/create-point', [AgentActionController::class, 'createPoint'])
             ->name('api.agent.actions.create-point');
-        Route::post('/create-itinerary', [\App\Http\Controllers\Api\Agent\AgentActionController::class, 'createItinerary'])
+        Route::post('/create-itinerary', [AgentActionController::class, 'createItinerary'])
             ->name('api.agent.actions.create-itinerary');
     });
 
 // SoundWalks — Public API
 Route::middleware(['throttle:60,1'])->group(function () {
-    Route::get('/sound-walks', [\App\Http\Controllers\Api\Gamification\SoundWalkController::class, 'index'])
+    Route::get('/sound-walks', [SoundWalkController::class, 'index'])
         ->name('api.sound-walks.index');
-    Route::get('/sound-walks/{soundWalk:slug}', [\App\Http\Controllers\Api\Gamification\SoundWalkController::class, 'show'])
+    Route::get('/sound-walks/{soundWalk:slug}', [SoundWalkController::class, 'show'])
         ->name('api.sound-walks.show');
 });
 
@@ -62,29 +74,29 @@ Route::post('/inbound/contact-ticket-replies', InboundContactTicketReplyControll
     ->name('api.inbound.contact-ticket-replies');
 
 Route::middleware(['throttle:scientific-api'])->group(function () {
-    Route::get('/scientific-stats/global', [\App\Http\Controllers\Api\ScientificStatsController::class, 'globalStats'])->name('api.scientific-stats.global');
-    Route::get('/scientific-stats/categories', [\App\Http\Controllers\Api\ScientificStatsController::class, 'categories'])->name('api.scientific-stats.categories');
-    Route::get('/scientific-stats/environments', [\App\Http\Controllers\Api\ScientificStatsController::class, 'environments'])->name('api.scientific-stats.environments');
-    Route::get('/scientific-stats/temporal', [\App\Http\Controllers\Api\ScientificStatsController::class, 'temporal'])->name('api.scientific-stats.temporal');
-    Route::get('/scientific-stats/geo-heatmap', [\App\Http\Controllers\Api\ScientificStatsController::class, 'geoHeatmap'])->name('api.scientific-stats.geo-heatmap');
-    Route::get('/scientific-stats/audio-features', [\App\Http\Controllers\Api\ScientificStatsController::class, 'audioFeatures'])->name('api.scientific-stats.audio-features');
-    Route::get('/scientific-stats/top-locations', [\App\Http\Controllers\Api\ScientificStatsController::class, 'topLocations'])->name('api.scientific-stats.top-locations');
-    Route::get('/scientific-stats/equipment', [\App\Http\Controllers\Api\ScientificStatsController::class, 'equipment'])->name('api.scientific-stats.equipment');
-    Route::get('/scientific-stats/species', [\App\Http\Controllers\Api\ScientificStatsController::class, 'species'])->name('api.scientific-stats.species');
-    Route::get('/scientific-stats/quality', [\App\Http\Controllers\Api\ScientificStatsController::class, 'quality'])->name('api.scientific-stats.quality');
-    Route::get('/scientific-stats/environmental', [\App\Http\Controllers\Api\ScientificStatsController::class, 'environmental'])->name('api.scientific-stats.environmental');
-    Route::get('/scientific-stats/model-stats', [\App\Http\Controllers\Api\ScientificStatsController::class, 'modelStats'])->name('api.scientific-stats.model-stats');
-    Route::get('/scientific-stats/dataset-completeness', [\App\Http\Controllers\Api\ScientificStatsController::class, 'datasetCompleteness'])->name('api.scientific-stats.dataset-completeness');
-    Route::get('/scientific-stats/schema', [\App\Http\Controllers\Api\ScientificStatsController::class, 'schema'])->name('api.scientific-stats.schema');
-    Route::get('/scientific-stats/dataset', [\App\Http\Controllers\Api\ScientificStatsController::class, 'dataset'])->name('api.scientific-stats.dataset');
-    Route::get('/scientific-stats/raw-data', [\App\Http\Controllers\Api\ScientificStatsController::class, 'rawData'])->name('api.scientific-stats.raw-data');
+    Route::get('/scientific-stats/global', [ScientificStatsController::class, 'globalStats'])->name('api.scientific-stats.global');
+    Route::get('/scientific-stats/categories', [ScientificStatsController::class, 'categories'])->name('api.scientific-stats.categories');
+    Route::get('/scientific-stats/environments', [ScientificStatsController::class, 'environments'])->name('api.scientific-stats.environments');
+    Route::get('/scientific-stats/temporal', [ScientificStatsController::class, 'temporal'])->name('api.scientific-stats.temporal');
+    Route::get('/scientific-stats/geo-heatmap', [ScientificStatsController::class, 'geoHeatmap'])->name('api.scientific-stats.geo-heatmap');
+    Route::get('/scientific-stats/audio-features', [ScientificStatsController::class, 'audioFeatures'])->name('api.scientific-stats.audio-features');
+    Route::get('/scientific-stats/top-locations', [ScientificStatsController::class, 'topLocations'])->name('api.scientific-stats.top-locations');
+    Route::get('/scientific-stats/equipment', [ScientificStatsController::class, 'equipment'])->name('api.scientific-stats.equipment');
+    Route::get('/scientific-stats/species', [ScientificStatsController::class, 'species'])->name('api.scientific-stats.species');
+    Route::get('/scientific-stats/quality', [ScientificStatsController::class, 'quality'])->name('api.scientific-stats.quality');
+    Route::get('/scientific-stats/environmental', [ScientificStatsController::class, 'environmental'])->name('api.scientific-stats.environmental');
+    Route::get('/scientific-stats/model-stats', [ScientificStatsController::class, 'modelStats'])->name('api.scientific-stats.model-stats');
+    Route::get('/scientific-stats/dataset-completeness', [ScientificStatsController::class, 'datasetCompleteness'])->name('api.scientific-stats.dataset-completeness');
+    Route::get('/scientific-stats/schema', [ScientificStatsController::class, 'schema'])->name('api.scientific-stats.schema');
+    Route::get('/scientific-stats/dataset', [ScientificStatsController::class, 'dataset'])->name('api.scientific-stats.dataset');
+    Route::get('/scientific-stats/raw-data', [ScientificStatsController::class, 'rawData'])->name('api.scientific-stats.raw-data');
 });
 
 Route::get('/map/sounds', [MapController::class, 'sounds'])->name('api.map.sounds');
 Route::get('/map/sounds/search', [MapController::class, 'search'])->middleware('throttle:search')->name('api.map.sounds.search');
 
-Route::get('/sounds/featured', [\App\Http\Controllers\Api\FeaturedController::class, 'sounds'])->name('api.sounds.featured');
-Route::get('/creators/featured', [\App\Http\Controllers\Api\FeaturedController::class, 'creators'])->name('api.creators.featured');
+Route::get('/sounds/featured', [FeaturedController::class, 'sounds'])->name('api.sounds.featured');
+Route::get('/creators/featured', [FeaturedController::class, 'creators'])->name('api.creators.featured');
 
 Route::get('/blog', [ApiBlogController::class, 'index'])->name('api.blog.index');
 Route::get('/blog/{slug}', [ApiBlogController::class, 'show'])->name('api.blog.show');
@@ -99,13 +111,13 @@ Route::prefix('radio/interactions')->middleware('throttle:60,1')->group(function
 });
 
 Route::prefix('internal/radio')
-    ->middleware([\App\Http\Middleware\VerifyRadioInternalToken::class])
+    ->middleware([VerifyRadioInternalToken::class])
     ->group(function () {
-        Route::get('playlist', [\App\Http\Controllers\Api\InternalRadioController::class, 'playlist']);
-        Route::get('playlist.m3u', [\App\Http\Controllers\Api\InternalRadioController::class, 'playlistM3u']);
-        Route::match(['get', 'post'], 'now-playing', [\App\Http\Controllers\Api\InternalRadioController::class, 'nowPlaying']);
-        Route::get('status', [\App\Http\Controllers\Api\InternalRadioController::class, 'status']);
-        Route::post('actions/reload', [\App\Http\Controllers\Api\InternalRadioController::class, 'reload']);
+        Route::get('playlist', [InternalRadioController::class, 'playlist']);
+        Route::get('playlist.m3u', [InternalRadioController::class, 'playlistM3u']);
+        Route::match(['get', 'post'], 'now-playing', [InternalRadioController::class, 'nowPlaying']);
+        Route::get('status', [InternalRadioController::class, 'status']);
+        Route::post('actions/reload', [InternalRadioController::class, 'reload']);
     });
 
 Route::middleware(['web', 'auth'])->get('/users/search', function (Request $request) {
@@ -118,14 +130,14 @@ Route::middleware(['web', 'auth'])->get('/users/search', function (Request $requ
 })->name('api.users.search');
 
 Route::prefix('internal/discord')
-    ->middleware(['throttle:discord', \App\Http\Middleware\AuthenticateInternalBot::class])
+    ->middleware(['throttle:discord', AuthenticateInternalBot::class])
     ->group(function () {
-        Route::get('stats', [\App\Http\Controllers\Api\InternalDiscordController::class, 'stats']);
-        Route::get('users/{discordId}', [\App\Http\Controllers\Api\InternalDiscordController::class, 'getUserByDiscordId']);
-        Route::get('sounds/search', [\App\Http\Controllers\Api\InternalDiscordController::class, 'searchSounds']);
-        Route::get('sounds/{id}', [\App\Http\Controllers\Api\InternalDiscordController::class, 'getSound']);
-        Route::get('radio/now-playing', [\App\Http\Controllers\Api\InternalDiscordController::class, 'getRadioNowPlaying']);
-        Route::post('link', [\App\Http\Controllers\Api\InternalDiscordController::class, 'linkAccount']);
+        Route::get('stats', [InternalDiscordController::class, 'stats']);
+        Route::get('users/{discordId}', [InternalDiscordController::class, 'getUserByDiscordId']);
+        Route::get('sounds/search', [InternalDiscordController::class, 'searchSounds']);
+        Route::get('sounds/{id}', [InternalDiscordController::class, 'getSound']);
+        Route::get('radio/now-playing', [InternalDiscordController::class, 'getRadioNowPlaying']);
+        Route::post('link', [InternalDiscordController::class, 'linkAccount']);
     });
 
 // Gamification — Arborisis Points
@@ -215,15 +227,15 @@ Route::middleware(['web', 'auth', 'throttle:30,1'])->group(function () {
 });
 
 // Audio Analysis — Internal callback
-Route::post('/internal/audio-analysis/callback', [\App\Http\Controllers\Api\InternalAudioAnalysisController::class, 'callback'])
+Route::post('/internal/audio-analysis/callback', [InternalAudioAnalysisController::class, 'callback'])
     ->name('api.internal.audio-analysis.callback')
-    ->middleware(\App\Http\Middleware\VerifyInternalApiToken::class);
+    ->middleware(VerifyInternalApiToken::class);
 
 // Audio Analysis — Public API
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('/sounds/{sound}/analysis', [\App\Http\Controllers\Web\AudioAnalysisController::class, 'showApi'])
+    Route::get('/sounds/{sound}/analysis', [AudioAnalysisController::class, 'showApi'])
         ->name('api.sounds.analysis.show');
-    Route::post('/sounds/{sound}/analysis/retry', [\App\Http\Controllers\Web\AudioAnalysisController::class, 'retry'])
+    Route::post('/sounds/{sound}/analysis/retry', [AudioAnalysisController::class, 'retry'])
         ->name('api.sounds.analysis.retry')
         ->middleware('throttle:5,1');
 });
@@ -240,10 +252,10 @@ Route::middleware(['web', 'auth', 'throttle:60,1'])->prefix('admin')->group(func
     Route::post('/arborisis-points/suggestions/{suggestion}', [AdminArborisisPointController::class, 'reviewSuggestion'])->name('api.admin.arborisis-points.suggestions.review');
 
     // SoundWalks moderation
-    Route::get('/sound-walks/pending', [\App\Http\Controllers\Api\Gamification\AdminSoundWalkController::class, 'pending'])->name('api.admin.sound-walks.pending');
-    Route::post('/sound-walks/{soundWalk:slug}/approve', [\App\Http\Controllers\Api\Gamification\AdminSoundWalkController::class, 'approve'])->name('api.admin.sound-walks.approve');
-    Route::post('/sound-walks/{soundWalk:slug}/reject', [\App\Http\Controllers\Api\Gamification\AdminSoundWalkController::class, 'reject'])->name('api.admin.sound-walks.reject');
-    Route::post('/sound-walks/{soundWalk:slug}/hide', [\App\Http\Controllers\Api\Gamification\AdminSoundWalkController::class, 'hide'])->name('api.admin.sound-walks.hide');
+    Route::get('/sound-walks/pending', [AdminSoundWalkController::class, 'pending'])->name('api.admin.sound-walks.pending');
+    Route::post('/sound-walks/{soundWalk:slug}/approve', [AdminSoundWalkController::class, 'approve'])->name('api.admin.sound-walks.approve');
+    Route::post('/sound-walks/{soundWalk:slug}/reject', [AdminSoundWalkController::class, 'reject'])->name('api.admin.sound-walks.reject');
+    Route::post('/sound-walks/{soundWalk:slug}/hide', [AdminSoundWalkController::class, 'hide'])->name('api.admin.sound-walks.hide');
 });
 
 // Daily Sound Ideas

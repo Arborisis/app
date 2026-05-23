@@ -20,8 +20,7 @@ class UserNearbyDetected implements ShouldBroadcast
         public User $recipient,
         public int $distanceMeters,
         public string $interactionType,
-    ) {
-    }
+    ) {}
 
     public function broadcastOn(): array
     {

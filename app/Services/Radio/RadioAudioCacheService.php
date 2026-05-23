@@ -170,12 +170,12 @@ class RadioAudioCacheService
         $root = $disk->path('');
 
         foreach (self::ALLOWED_TYPES as $type) {
-            $typePath = $root . $type;
+            $typePath = $root.$type;
             if (! is_dir($typePath)) {
                 continue;
             }
 
-            $files = glob($typePath . '/*.mp3');
+            $files = glob($typePath.'/*.mp3');
             if ($files === false) {
                 continue;
             }
@@ -244,7 +244,7 @@ class RadioAudioCacheService
             throw new \RuntimeException('Cannot open source stream');
         }
 
-        $tempOriginal = sys_get_temp_dir() . '/' . Str::uuid() . '_' . basename($sourcePath);
+        $tempOriginal = sys_get_temp_dir().'/'.Str::uuid().'_'.basename($sourcePath);
         $written = file_put_contents($tempOriginal, $stream);
         fclose($stream);
 

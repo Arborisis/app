@@ -1,9 +1,10 @@
 <?php
 
 use App\Services\Radio\RadioAudioNormalizationService;
+use Symfony\Component\Process\Process;
 
 beforeEach(function () {
-    $this->service = new RadioAudioNormalizationService();
+    $this->service = new RadioAudioNormalizationService;
 });
 
 it('normalizes mp3 to 44100 stereo 192k', function () {
@@ -18,7 +19,7 @@ it('normalizes mp3 to 44100 stereo 192k', function () {
         ->and(file_exists($output))->toBeTrue();
 
     // Verify with ffprobe
-    $process = new Symfony\Component\Process\Process([
+    $process = new Process([
         'ffprobe', '-v', 'error', '-select_streams', 'a:0',
         '-show_entries', 'stream=sample_rate,channels,bit_rate',
         '-of', 'json', $output,

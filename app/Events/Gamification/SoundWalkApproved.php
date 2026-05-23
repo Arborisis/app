@@ -17,6 +17,5 @@ class SoundWalkApproved
     public function __construct(
         public readonly SoundWalk $soundWalk,
         public readonly User $approvedBy,
-    ) {
-    }
+    ) {}
 }

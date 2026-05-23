@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace App\Services\Scientific;
 
 use App\Enums\MetricType;
-use App\Enums\ModerationStatus;
 use App\Models\BirdnetDetection;
 use App\Models\EnvironmentalObservation;
 use App\Models\ListeningPoint;
-use App\Models\ScientificMetric;
 use App\Models\Sound;
 use App\Models\SoundAnalysis;
 use App\Models\SoundLocation;
@@ -21,7 +19,7 @@ use Illuminate\Support\Facades\DB;
 class ScientificStatsService
 {
     /**
-     * @param array<string, mixed> $filters
+     * @param  array<string, mixed>  $filters
      */
     private function publicSoundQuery(array $filters = []): Builder
     {
@@ -29,7 +27,7 @@ class ScientificStatsService
     }
 
     /**
-     * @param array<string, mixed> $filters
+     * @param  array<string, mixed>  $filters
      */
     private function applyPublicSoundFilters(Builder $query, array $filters = []): Builder
     {
@@ -53,7 +51,7 @@ class ScientificStatsService
     }
 
     /**
-     * @param array<string, mixed> $filters
+     * @param  array<string, mixed>  $filters
      */
     private function applyPublicSoundTableFilters(QueryBuilder $query, array $filters = []): QueryBuilder
     {
@@ -77,7 +75,7 @@ class ScientificStatsService
     }
 
     /**
-     * @param array<string, mixed> $filters
+     * @param  array<string, mixed>  $filters
      */
     private function publicAnalysisQuery(array $filters = []): Builder
     {
@@ -234,8 +232,8 @@ class ScientificStatsService
             $values = $analyses->map(function ($a) use ($key) {
                 return $this->audioFeatureValue($a, $key);
             })
-            ->filter(fn ($v) => is_numeric($v))
-            ->map(fn ($v) => (float) $v);
+                ->filter(fn ($v) => is_numeric($v))
+                ->map(fn ($v) => (float) $v);
 
             if ($values->isNotEmpty()) {
                 $result[$feature] = [
@@ -276,10 +274,10 @@ class ScientificStatsService
             $allValues = $analyses->map(function ($a) use ($key) {
                 return $this->audioFeatureValue($a, $key);
             })
-            ->filter(fn ($v) => is_numeric($v))
-            ->map(fn ($v) => (float) $v)
-            ->sort()
-            ->values();
+                ->filter(fn ($v) => is_numeric($v))
+                ->map(fn ($v) => (float) $v)
+                ->sort()
+                ->values();
 
             if ($allValues->count() < 2) {
                 continue;
@@ -364,8 +362,8 @@ class ScientificStatsService
     }
 
     /**
-     * @param array<string, mixed> $array
-     * @param array<int, string> $path
+     * @param  array<string, mixed>  $array
+     * @param  array<int, string>  $path
      */
     private function pluckNested(array $array, array $path): mixed
     {
@@ -376,6 +374,7 @@ class ScientificStatsService
             }
             $current = $current[$key];
         }
+
         return $current;
     }
 
@@ -744,8 +743,7 @@ class ScientificStatsService
     }
 
     /**
-     * @param array<string, mixed> $filters
-     *
+     * @param  array<string, mixed>  $filters
      * @return array<string, mixed>
      */
     private function analysisMetricCoverage(string $column, array $filters, int $total): array
@@ -768,7 +766,7 @@ class ScientificStatsService
     }
 
     /**
-     * @param array<string, int> $fields
+     * @param  array<string, int>  $fields
      */
     private function scientificReadinessScore(array $fields, int $total): float
     {
@@ -803,7 +801,7 @@ class ScientificStatsService
     }
 
     /**
-     * @param array<int, float> $values
+     * @param  array<int, float>  $values
      */
     private function median(array $values): float
     {
@@ -819,7 +817,7 @@ class ScientificStatsService
     }
 
     /**
-     * @param array<int, float> $values
+     * @param  array<int, float>  $values
      */
     private function std(array $values): float
     {
@@ -881,8 +879,7 @@ class ScientificStatsService
      * @return array<string, mixed>
      */
     /**
-     * @param array<string, mixed> $filters
-     *
+     * @param  array<string, mixed>  $filters
      * @return array<string, mixed>
      */
     public function getGlobalMetricsOverview(array $filters = []): array
@@ -898,8 +895,7 @@ class ScientificStatsService
     }
 
     /**
-     * @param array<string, mixed> $filters
-     *
+     * @param  array<string, mixed>  $filters
      * @return Collection<int, float>
      */
     private function publicMetricValues(MetricType $type, array $filters = []): Collection
@@ -921,8 +917,7 @@ class ScientificStatsService
     }
 
     /**
-     * @param Collection<int, float> $values
-     *
+     * @param  Collection<int, float>  $values
      * @return array<string, mixed>
      */
     private function metricSummary(Collection $values): array
@@ -937,8 +932,7 @@ class ScientificStatsService
     }
 
     /**
-     * @param array<string, mixed> $filters
-     *
+     * @param  array<string, mixed>  $filters
      * @return array<string, mixed>
      */
     private function getModelWeatherContext(array $filters = []): array
@@ -959,8 +953,7 @@ class ScientificStatsService
     }
 
     /**
-     * @param array<string, mixed> $filters
-     *
+     * @param  array<string, mixed>  $filters
      * @return array<int, array<string, mixed>>
      */
     private function getIndividualSoundWeatherRows(array $filters = [], int $limit = 100): array
@@ -1001,8 +994,7 @@ class ScientificStatsService
     }
 
     /**
-     * @param array<string, mixed> $filters
-     *
+     * @param  array<string, mixed>  $filters
      * @return array<string, mixed>
      */
     private function getListeningPointWeatherOverview(array $filters = []): array
@@ -1080,8 +1072,7 @@ class ScientificStatsService
     }
 
     /**
-     * @param array<string, mixed> $filters
-     *
+     * @param  array<string, mixed>  $filters
      * @return array<int, array<string, mixed>>
      */
     private function metricByWeatherCondition(MetricType $type, array $filters = []): array

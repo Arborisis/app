@@ -23,9 +23,9 @@ class ProcessAgentChatJob implements ShouldQueue
     public int $timeout = 360;
 
     /**
-     * @param array<int, array{role: string, content: string}> $history
-     * @param array<string, mixed> $page
-     * @param array<string, mixed>|null $location
+     * @param  array<int, array{role: string, content: string}>  $history
+     * @param  array<string, mixed>  $page
+     * @param  array<string, mixed>|null  $location
      */
     public function __construct(
         public readonly string $jobId,
@@ -35,8 +35,7 @@ class ProcessAgentChatJob implements ShouldQueue
         public readonly ?string $conversationId,
         public readonly ?int $userId,
         public readonly ?array $location,
-    ) {
-    }
+    ) {}
 
     public function handle(OpenRouterAgentService $agent): void
     {
@@ -105,7 +104,7 @@ class ProcessAgentChatJob implements ShouldQueue
     }
 
     /**
-     * @param array<string, mixed> $payload
+     * @param  array<string, mixed>  $payload
      */
     private function store(array $payload): void
     {

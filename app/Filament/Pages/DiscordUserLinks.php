@@ -6,22 +6,28 @@ namespace App\Filament\Pages;
 
 use App\Models\UserDiscordAccount;
 use Filament\Pages\Page;
+use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-use Filament\Tables\Actions\DeleteAction;
 
 class DiscordUserLinks extends Page implements HasTable
 {
     use InteractsWithTable;
 
     protected static ?string $navigationIcon = 'heroicon-o-link';
+
     protected static ?string $navigationLabel = 'Liens utilisateurs';
+
     protected static ?string $title = 'Liens Discord / Arborisis';
+
     protected static ?string $slug = 'discord-user-links';
+
     protected static string $view = 'filament.pages.discord-user-links';
+
     protected static ?string $navigationGroup = 'Discord';
+
     protected static ?int $navigationSort = 2;
 
     public static function canAccess(): bool

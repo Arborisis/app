@@ -9,7 +9,7 @@ class BirdnetDetectionFilterService
     /**
      * Filtre et déduplique les détections BirdNET brutes.
      *
-     * @param array<int, array<string, mixed>> $detections
+     * @param  array<int, array<string, mixed>>  $detections
      * @return array<int, array<string, mixed>>
      */
     public function filter(array $detections): array
@@ -54,8 +54,8 @@ class BirdnetDetectionFilterService
      * Déduplique les détections de la même espèce qui se chevauchent temporellement.
      * Garde toujours celle avec la meilleure confiance (grâce au tri préalable).
      *
-     * @param array<int, array<string, mixed>> $detections
-     * @param float $overlapThreshold Seuil IoU (0.0 - 1.0)
+     * @param  array<int, array<string, mixed>>  $detections
+     * @param  float  $overlapThreshold  Seuil IoU (0.0 - 1.0)
      * @return array<int, array<string, mixed>>
      */
     private function deduplicate(array $detections, float $overlapThreshold): array

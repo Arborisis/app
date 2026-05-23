@@ -21,6 +21,7 @@ class SocialListController extends Controller
 
         $followers->getCollection()->transform(function ($follower) {
             $follower->avatar_url = $this->resolveAvatarUrl($follower);
+
             return $follower;
         });
 
@@ -38,6 +39,7 @@ class SocialListController extends Controller
 
         $following->getCollection()->transform(function ($followed) {
             $followed->avatar_url = $this->resolveAvatarUrl($followed);
+
             return $followed;
         });
 
@@ -55,6 +57,7 @@ class SocialListController extends Controller
 
         $friends->getCollection()->transform(function ($friend) {
             $friend->avatar_url = $this->resolveAvatarUrl($friend);
+
             return $friend;
         });
 
@@ -66,7 +69,7 @@ class SocialListController extends Controller
 
     private function resolveAvatarUrl(User $user): ?string
     {
-        if (!$user->profile?->avatar) {
+        if (! $user->profile?->avatar) {
             return null;
         }
 

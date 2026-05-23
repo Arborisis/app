@@ -9,7 +9,7 @@ use App\Services\AI\OpenRouterService;
 use Illuminate\Support\Facades\Http;
 
 beforeEach(function () {
-    $this->service = new OpenRouterService();
+    $this->service = new OpenRouterService;
     config(['services.openrouter.api_key' => 'test-key']);
 });
 

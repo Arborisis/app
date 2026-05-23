@@ -20,6 +20,7 @@ class ComputeScientificMetricsJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 2;
+
     public $backoff = [60, 300];
 
     public function __construct(private readonly int $soundId) {}

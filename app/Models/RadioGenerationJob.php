@@ -14,13 +14,19 @@ class RadioGenerationJob extends Model
     use HasFactory;
 
     public const STATUS_PENDING = 'pending';
+
     public const STATUS_RUNNING = 'running';
+
     public const STATUS_COMPLETED = 'completed';
+
     public const STATUS_FAILED = 'failed';
 
     public const KIND_PODCAST = 'podcast';
+
     public const KIND_FLASH = 'flash';
+
     public const KIND_EMISSION = 'emission';
+
     public const KIND_DJ = 'dj';
 
     protected $fillable = [

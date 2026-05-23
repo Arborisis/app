@@ -7,9 +7,9 @@ namespace App\Models;
 use App\Enums\RadioPodcastStatus;
 use App\Enums\RadioProductionPreset;
 use App\Enums\RadioShowType;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
 
 class RadioPodcast extends Model
 {
@@ -46,7 +46,7 @@ class RadioPodcast extends Model
     ];
 
     protected $casts = [
-        'show_type'    => RadioShowType::class,
+        'show_type' => RadioShowType::class,
         'production_preset' => RadioProductionPreset::class,
         'status' => RadioPodcastStatus::class,
         'script_json' => 'array',

@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 class SeedDemoArborisisPoints extends Command
 {
     protected $signature = 'arborisis:seed-demo {count=15}';
+
     protected $description = 'Create demo Arborisis points for production testing';
 
     public function handle(): int
@@ -25,6 +26,7 @@ class SeedDemoArborisisPoints extends Command
 
         if (! $admin) {
             $this->error('No user found. Create a user first.');
+
             return 1;
         }
 
@@ -53,7 +55,7 @@ class SeedDemoArborisisPoints extends Command
             $point = ArborisisPoint::create([
                 'user_id' => $admin->id,
                 'title' => $data['title'],
-                'slug' => Str::slug($data['title']) . '-' . uniqid(),
+                'slug' => Str::slug($data['title']).'-'.uniqid(),
                 'description' => 'Un lieu remarquable pour l\'écoute et l\'observation de la nature.',
                 'latitude' => $data['sens']->requiresApproximateLocation() ? $coords['approximate_latitude'] : $data['lat'],
                 'longitude' => $data['sens']->requiresApproximateLocation() ? $coords['approximate_longitude'] : $data['lng'],
@@ -76,6 +78,7 @@ class SeedDemoArborisisPoints extends Command
         }
 
         $this->info("\n✅ {$created} demo points created successfully.");
+
         return 0;
     }
 }

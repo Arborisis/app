@@ -9,9 +9,10 @@ use App\Enums\RadioListenerSessionStatus;
 use App\Models\RadioJingle;
 use App\Models\RadioListenerSession;
 use App\Models\RadioPodcast;
-use App\Models\RadioSetting;
 use App\Models\RadioSchedule;
+use App\Models\RadioSetting;
 use App\Models\Sound;
+use App\Services\Storage\SignedUrlService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -22,24 +23,41 @@ use Illuminate\Support\Str;
 class RadioStreamService
 {
     private const CACHE_KEY_NOW_PLAYING = 'radio:now-playing';
+
     private const CACHE_KEY_HISTORY = 'radio:history';
+
     private const CACHE_KEY_LISTENERS = 'radio:listeners';
+
     private const CACHE_KEY_LISTENER_SESSIONS = 'radio:listener-sessions';
+
     private const CACHE_KEY_LISTENER_GENERATION = 'radio:listener-generation';
+
     private const CACHE_KEY_EPOCH = 'radio:epoch';
+
     private const CACHE_KEY_PLAYLIST = 'radio:playlist';
 
     private int $icyMetaint;
+
     private int $chunkSize;
+
     private int $historyLimit;
+
     private bool $shuffle;
+
     private bool $enabled;
+
     private int $tempUrlTtlMinutes;
+
     private bool $loop;
+
     private int $gapMs;
+
     private int $listenerTtlSeconds;
+
     private ?int $maxListenersDisplay;
+
     private ?string $activeListenerId = null;
+
     private ?int $activeListenerGeneration = null;
 
     public function __construct()
@@ -61,7 +79,7 @@ class RadioStreamService
     public function getPlaylist(): Collection
     {
         if (! $this->enabled) {
-            return new Collection();
+            return new Collection;
         }
 
         $scheduledPlaylist = $this->getScheduledPlaylist();
@@ -84,7 +102,7 @@ class RadioStreamService
     private function getScheduledPlaylist(): Collection
     {
         if (! Schema::hasTable('radio_schedules') || ! Schema::hasTable('radio_schedule_sound')) {
-            return new Collection();
+            return new Collection;
         }
 
         $schedule = RadioSchedule::query()
@@ -97,7 +115,7 @@ class RadioStreamService
             ->first(fn (RadioSchedule $schedule): bool => $schedule->isCurrentlyActive());
 
         if (! $schedule) {
-            return new Collection();
+            return new Collection;
         }
 
         return $schedule->sounds
@@ -160,7 +178,7 @@ class RadioStreamService
         });
 
         if (empty($ids)) {
-            return new Collection();
+            return new Collection;
         }
 
         return Sound::with(['user', 'soundFile'])
@@ -279,7 +297,7 @@ class RadioStreamService
         $playlist = $this->getDeterministicPlaylist();
 
         if ($playlist->isEmpty()) {
-            return new Collection();
+            return new Collection;
         }
 
         $currentIndex = $this->resolveCurrentIndex();
@@ -295,7 +313,7 @@ class RadioStreamService
         }
 
         if (empty($historyIds)) {
-            return new Collection();
+            return new Collection;
         }
 
         return Sound::with('user')
@@ -596,7 +614,7 @@ class RadioStreamService
     private function getActiveJingles(RadioJinglePlacement $placement): Collection
     {
         if (! Schema::hasTable('radio_jingles')) {
-            return new Collection();
+            return new Collection;
         }
 
         return RadioJingle::query()
@@ -899,7 +917,7 @@ class RadioStreamService
         $path = $sound->soundFile->path;
 
         if ($disk === 'r2') {
-            return app(\App\Services\Storage\SignedUrlService::class)->url($disk, $path, $this->tempUrlTtlMinutes);
+            return app(SignedUrlService::class)->url($disk, $path, $this->tempUrlTtlMinutes);
         }
 
         if ($disk === 'audio' || $disk === 's3') {

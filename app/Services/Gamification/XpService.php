@@ -82,7 +82,7 @@ class XpService
 
     private function getDailyXp(int $userId): int
     {
-        $key = self::DAILY_XP_KEY_PREFIX . $userId . ':' . now()->format('Y-m-d');
+        $key = self::DAILY_XP_KEY_PREFIX.$userId.':'.now()->format('Y-m-d');
 
         if (app()->environment('testing')) {
             return (int) Cache::get($key, 0);
@@ -93,7 +93,7 @@ class XpService
 
     private function trackDailyXp(int $userId, int $amount): void
     {
-        $key = self::DAILY_XP_KEY_PREFIX . $userId . ':' . now()->format('Y-m-d');
+        $key = self::DAILY_XP_KEY_PREFIX.$userId.':'.now()->format('Y-m-d');
         if (app()->environment('testing')) {
             Cache::put($key, $this->getDailyXp($userId) + $amount, 86400);
 

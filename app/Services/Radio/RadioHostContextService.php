@@ -24,13 +24,13 @@ class RadioHostContextService
         $globalStats = $this->stats->getGlobalStats();
 
         return [
-            'new_sounds'      => $this->newSounds(),
-            'new_users'       => $this->newUsers(),
-            'popular_sounds'  => $this->popularSounds(),
-            'total_sounds'    => $globalStats['total_sounds'],
-            'total_creators'  => $globalStats['total_creators'],
-            'categories'      => $this->stats->getCategoryDistribution(),
-            'generated_at'    => now()->toIso8601String(),
+            'new_sounds' => $this->newSounds(),
+            'new_users' => $this->newUsers(),
+            'popular_sounds' => $this->popularSounds(),
+            'total_sounds' => $globalStats['total_sounds'],
+            'total_creators' => $globalStats['total_creators'],
+            'categories' => $this->stats->getCategoryDistribution(),
+            'generated_at' => now()->toIso8601String(),
         ];
     }
 
@@ -59,7 +59,7 @@ class RadioHostContextService
             ->limit(10)
             ->get()
             ->map(fn (User $u) => [
-                'name'        => $u->name,
+                'name' => $u->name,
                 'sounds_count' => $u->sounds_count ?? 0,
             ])
             ->values()
@@ -83,15 +83,15 @@ class RadioHostContextService
     public function soundPayload(Sound $sound): array
     {
         return [
-            'id'         => $sound->id,
-            'title'      => $sound->title,
-            'creator'    => $sound->user?->name ?? 'Arborisis',
-            'category'   => $sound->category?->name,
-            'location'   => $sound->soundLocation?->location_name,
-            'duration'   => $sound->duration,
+            'id' => $sound->id,
+            'title' => $sound->title,
+            'creator' => $sound->user?->name ?? 'Arborisis',
+            'category' => $sound->category?->name,
+            'location' => $sound->soundLocation?->location_name,
+            'duration' => $sound->duration,
             'play_count' => $sound->play_count ?? 0,
             'like_count' => $sound->like_count ?? 0,
-            'analysis'   => $this->analysisPayload($sound->soundAnalysis),
+            'analysis' => $this->analysisPayload($sound->soundAnalysis),
         ];
     }
 

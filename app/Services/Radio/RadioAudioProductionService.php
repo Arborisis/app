@@ -43,7 +43,7 @@ class RadioAudioProductionService
     }
 
     /**
-     * @param list<string> $segmentFiles
+     * @param  list<string>  $segmentFiles
      */
     public function produceSegmentedShow(array $segmentFiles, array $metadata = []): ?string
     {
@@ -146,7 +146,7 @@ class RadioAudioProductionService
         $duckedBedCount = (int) ($fieldBedFile && file_exists($fieldBedFile)) + (int) ($bed && file_exists($bed));
         $splitLabels = ['[voice]'];
         for ($i = 1; $i <= $duckedBedCount; $i++) {
-            $splitLabels[] = '[voice_sc' . $i . ']';
+            $splitLabels[] = '[voice_sc'.$i.']';
         }
 
         $inputs = ['-i', $voiceFile];
@@ -158,8 +158,8 @@ class RadioAudioProductionService
         if ($fieldBedFile && file_exists($fieldBedFile)) {
             array_push($inputs, '-stream_loop', '-1', '-i', $fieldBedFile);
             $fieldVolume = (float) ($generated['field_bed_volume'] ?? $preset->fieldBedVolume);
-            $filterParts[] = "[{$inputIndex}:a]aformat=sample_rates=44100:channel_layouts=stereo,atrim=0:{$duration},afade=t=in:st=0:d=2,afade=t=out:st=" . max(0, $duration - 4) . ':d=4,volume=' . $fieldVolume . '[fieldraw]';
-            $filterParts[] = $this->sidechainFilter()->build('[fieldraw]', '[voice_sc' . $sidechainIndex . ']', '[field]', $preset);
+            $filterParts[] = "[{$inputIndex}:a]aformat=sample_rates=44100:channel_layouts=stereo,atrim=0:{$duration},afade=t=in:st=0:d=2,afade=t=out:st=".max(0, $duration - 4).':d=4,volume='.$fieldVolume.'[fieldraw]';
+            $filterParts[] = $this->sidechainFilter()->build('[fieldraw]', '[voice_sc'.$sidechainIndex.']', '[field]', $preset);
             $mixLabels[] = '[field]';
             $inputIndex++;
             $sidechainIndex++;
@@ -168,8 +168,8 @@ class RadioAudioProductionService
         if ($bed && file_exists($bed)) {
             array_push($inputs, '-stream_loop', '-1', '-i', $bed);
             $musicVolume = (float) ($generated['music_volume'] ?? $preset->musicVolume);
-            $filterParts[] = "[{$inputIndex}:a]aformat=sample_rates=44100:channel_layouts=stereo,atrim=0:{$duration},afade=t=in:st=0:d=4,afade=t=out:st=" . max(0, $duration - 6) . ':d=6,volume=' . $musicVolume . '[musicraw]';
-            $filterParts[] = $this->sidechainFilter()->build('[musicraw]', '[voice_sc' . $sidechainIndex . ']', '[music]', $preset);
+            $filterParts[] = "[{$inputIndex}:a]aformat=sample_rates=44100:channel_layouts=stereo,atrim=0:{$duration},afade=t=in:st=0:d=4,afade=t=out:st=".max(0, $duration - 6).':d=6,volume='.$musicVolume.'[musicraw]';
+            $filterParts[] = $this->sidechainFilter()->build('[musicraw]', '[voice_sc'.$sidechainIndex.']', '[music]', $preset);
             $mixLabels[] = '[music]';
             $inputIndex++;
             $sidechainIndex++;
@@ -191,9 +191,9 @@ class RadioAudioProductionService
             $mixLabels[] = '[outro]';
         }
 
-        $filterParts[] = implode('', $mixLabels) . 'amix=inputs=' . count($mixLabels) . ':duration=first:dropout_transition=3,' . $preset->loudnormFilter() . '[aout]';
+        $filterParts[] = implode('', $mixLabels).'amix=inputs='.count($mixLabels).':duration=first:dropout_transition=3,'.$preset->loudnormFilter().'[aout]';
 
-        $output = sys_get_temp_dir() . '/' . Str::uuid() . '_radio_produced.mp3';
+        $output = sys_get_temp_dir().'/'.Str::uuid().'_radio_produced.mp3';
         $process = new Process(array_merge([
             'ffmpeg',
             '-y',
@@ -222,21 +222,21 @@ class RadioAudioProductionService
     private function basicMix(string $voiceFile, ?string $backgroundFile): string
     {
         if (! $backgroundFile || ! file_exists($backgroundFile)) {
-            $output = sys_get_temp_dir() . '/' . Str::uuid() . '_radio_voice.mp3';
+            $output = sys_get_temp_dir().'/'.Str::uuid().'_radio_voice.mp3';
             $this->normalization->normalize($voiceFile, $output);
 
             return $output;
         }
 
         $duration = $this->normalization->probeDuration($voiceFile) ?? 180;
-        $output = sys_get_temp_dir() . '/' . Str::uuid() . '_radio_basic_mix.mp3';
+        $output = sys_get_temp_dir().'/'.Str::uuid().'_radio_basic_mix.mp3';
         $process = new Process([
             'ffmpeg',
             '-y',
             '-i', $voiceFile,
             '-stream_loop', '-1',
             '-i', $backgroundFile,
-            '-filter_complex', '[0:a]volume=1.0[a0];[1:a]atrim=0:' . $duration . ',volume=0.20[a1];[a0][a1]amix=inputs=2:duration=first:dropout_transition=2,loudnorm=I=-16:TP=-1.5:LRA=11[aout]',
+            '-filter_complex', '[0:a]volume=1.0[a0];[1:a]atrim=0:'.$duration.',volume=0.20[a1];[a0][a1]amix=inputs=2:duration=first:dropout_transition=2,loudnorm=I=-16:TP=-1.5:LRA=11[aout]',
             '-map', '[aout]',
             '-codec:a', 'libmp3lame',
             '-b:a', '192k',
@@ -256,18 +256,18 @@ class RadioAudioProductionService
     }
 
     /**
-     * @param list<string> $segmentFiles
+     * @param  list<string>  $segmentFiles
      */
     private function concatSegments(array $segmentFiles): ?string
     {
-        $concatListPath = sys_get_temp_dir() . '/' . Str::uuid() . '_radio_concat.txt';
+        $concatListPath = sys_get_temp_dir().'/'.Str::uuid().'_radio_concat.txt';
         $concatContent = '';
         foreach ($segmentFiles as $file) {
-            $concatContent .= "file '" . str_replace("'", "'\\''", $file) . "'\n";
+            $concatContent .= "file '".str_replace("'", "'\\''", $file)."'\n";
         }
         file_put_contents($concatListPath, $concatContent);
 
-        $output = sys_get_temp_dir() . '/' . Str::uuid() . '_radio_concat.mp3';
+        $output = sys_get_temp_dir().'/'.Str::uuid().'_radio_concat.mp3';
         $process = new Process([
             'ffmpeg',
             '-y',
@@ -350,7 +350,7 @@ class RadioAudioProductionService
     }
 
     /**
-     * @param array<string, string|null> $files
+     * @param  array<string, string|null>  $files
      */
     private function unlinkFiles(array $files): void
     {

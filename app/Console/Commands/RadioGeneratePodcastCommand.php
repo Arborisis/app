@@ -39,7 +39,7 @@ class RadioGeneratePodcastCommand extends Command
                 ['ID', $podcast->id],
                 ['Title', $podcast->title],
                 ['Status', $podcast->status->value],
-                ['Duration', $podcast->actual_duration_seconds . 's'],
+                ['Duration', $podcast->actual_duration_seconds.'s'],
                 ['Path', $podcast->path],
             ]
         );

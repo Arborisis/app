@@ -6,20 +6,26 @@ namespace App\Services\Dashboard;
 
 use App\Enums\QuestType;
 use App\Enums\SoundIdeaStatus;
+use App\Models\Comment;
 use App\Models\DailySoundIdea;
+use App\Models\Like;
 use App\Models\Quest;
 use App\Models\User;
 use App\Models\UserSoundIdeaProgress;
 use App\Services\Echo\WalletService;
 use App\Services\Gamification\QuestService;
 use App\Services\Gamification\XpService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 
 class DashboardService
 {
     private const CACHE_TTL_STATS = 60;      // 1 minute for stats
+
     private const CACHE_TTL_ACTIVITIES = 120; // 2 minutes for activities
+
     private const CACHE_TTL_GAMIFICATION = 300; // 5 minutes for gamification
+
     private const CACHE_TTL_IDEAS = 300;     // 5 minutes for daily ideas
 
     public function __construct(
@@ -64,7 +70,7 @@ class DashboardService
     {
         return Cache::remember("dashboard:activities:{$user->id}", self::CACHE_TTL_ACTIVITIES, function () use ($user): array {
             // Optimized query: get likes directly with sound info, not through sounds
-            $recentLikes = \App\Models\Like::query()
+            $recentLikes = Like::query()
                 ->with(['user:id,name', 'likeable:id,title'])
                 ->whereHas('likeable', fn ($q) => $q->where('user_id', $user->id))
                 ->where('created_at', '>=', now()->subDays(30))
@@ -79,7 +85,7 @@ class DashboardService
                     'created_at' => $like->created_at->toISOString(),
                 ]);
 
-            $recentComments = \App\Models\Comment::query()
+            $recentComments = Comment::query()
                 ->with(['user:id,name', 'commentable:id,title'])
                 ->whereHas('commentable', fn ($q) => $q->where('user_id', $user->id))
                 ->where('created_at', '>=', now()->subDays(30))
@@ -213,9 +219,9 @@ class DashboardService
                     'icon' => $achievement->icon,
                     'category' => $achievement->category?->value,
                     'points' => $achievement->points,
-                    'unlocked_at' => $achievement->pivot->unlocked_at instanceof \Carbon\Carbon
+                    'unlocked_at' => $achievement->pivot->unlocked_at instanceof Carbon
                         ? $achievement->pivot->unlocked_at->toISOString()
-                        : ($achievement->pivot->unlocked_at ? \Carbon\Carbon::parse($achievement->pivot->unlocked_at)->toISOString() : null),
+                        : ($achievement->pivot->unlocked_at ? Carbon::parse($achievement->pivot->unlocked_at)->toISOString() : null),
                 ])
                 ->toArray();
 
@@ -230,9 +236,9 @@ class DashboardService
                     'icon' => $medal->icon,
                     'rarity' => $medal->rarity?->value,
                     'category' => $medal->category?->value,
-                    'unlocked_at' => $medal->pivot->unlocked_at instanceof \Carbon\Carbon
+                    'unlocked_at' => $medal->pivot->unlocked_at instanceof Carbon
                         ? $medal->pivot->unlocked_at->toISOString()
-                        : ($medal->pivot->unlocked_at ? \Carbon\Carbon::parse($medal->pivot->unlocked_at)->toISOString() : null),
+                        : ($medal->pivot->unlocked_at ? Carbon::parse($medal->pivot->unlocked_at)->toISOString() : null),
                 ])
                 ->toArray();
 

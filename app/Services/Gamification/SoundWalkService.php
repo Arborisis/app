@@ -19,7 +19,7 @@ use Illuminate\Validation\ValidationException;
 class SoundWalkService
 {
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      * @return array<string, mixed>
      */
     public function previewItinerary(array $data): array
@@ -135,7 +135,7 @@ class SoundWalkService
         $count = 1;
 
         while (SoundWalk::where('slug', $slug)->exists()) {
-            $slug = $base . '-' . $count;
+            $slug = $base.'-'.$count;
             $count++;
         }
 
@@ -143,7 +143,7 @@ class SoundWalkService
     }
 
     /**
-     * @param array<int, array<string, mixed>> $waypoints
+     * @param  array<int, array<string, mixed>>  $waypoints
      * @return array<string, mixed>
      */
     private function buildRoute(array $waypoints): array
@@ -178,7 +178,7 @@ class SoundWalkService
     }
 
     /**
-     * @param array<int, array<string, mixed>> $waypoints
+     * @param  array<int, array<string, mixed>>  $waypoints
      * @return array<string, mixed>|null
      */
     private function routeWaypoints(array $waypoints): ?array
@@ -243,7 +243,7 @@ class SoundWalkService
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      * @return array<int, array<string, mixed>>
      */
     private function resolveWaypointCoordinates(array $data): array
@@ -292,7 +292,7 @@ class SoundWalkService
     }
 
     /**
-     * @param array<string, mixed> $waypoint
+     * @param  array<string, mixed>  $waypoint
      * @return array<string, mixed>
      */
     private function resolveArborisisPointWaypoint(array $waypoint): array
@@ -319,7 +319,7 @@ class SoundWalkService
     }
 
     /**
-     * @param array<string, mixed> $waypoint
+     * @param  array<string, mixed>  $waypoint
      */
     private function hasWaypointCoordinates(array $waypoint): bool
     {
@@ -333,8 +333,8 @@ class SoundWalkService
     }
 
     /**
-     * @param array<string, mixed> $waypoint
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $waypoint
+     * @param  array<string, mixed>  $data
      */
     private function geocodingQuery(array $waypoint, array $data): ?string
     {

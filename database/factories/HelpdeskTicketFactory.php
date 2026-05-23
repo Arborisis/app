@@ -19,7 +19,7 @@ class HelpdeskTicketFactory extends Factory
         return [
             'user_id' => User::factory(),
             'category_id' => null,
-            'ticket_number' => 'ARB-' . now()->format('Ymd') . '-' . strtoupper(substr(uniqid(), -4)),
+            'ticket_number' => 'ARB-'.now()->format('Ymd').'-'.strtoupper(substr(uniqid(), -4)),
             'subject' => fake()->sentence(),
             'body' => fake()->paragraphs(2, true),
             'status' => HelpdeskTicketStatus::Open,

@@ -307,7 +307,7 @@ class ListeningPointMetricsService
         MetricType $type,
         float $value,
         array $components = [],
-        string $periodKey = null,
+        ?string $periodKey = null,
     ): ScientificMetric {
         return ScientificMetric::updateOrCreate(
             [

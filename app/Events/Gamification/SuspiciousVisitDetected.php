@@ -12,7 +12,5 @@ class SuspiciousVisitDetected
 {
     use Dispatchable, SerializesModels;
 
-    public function __construct(public ArborisisVisit $visit)
-    {
-    }
+    public function __construct(public ArborisisVisit $visit) {}
 }
