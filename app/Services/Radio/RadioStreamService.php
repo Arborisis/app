@@ -64,15 +64,15 @@ class RadioStreamService
     {
         $settings = Schema::hasTable('radio_settings') ? RadioSetting::query()->first() : null;
 
-        $this->icyMetaint = $settings?->icy_metaint ?? config('radio.icy_metaint', 8192);
-        $this->chunkSize = config('radio.chunk_size', 8192);
-        $this->historyLimit = $settings?->history_limit ?? config('radio.history_limit', 20);
-        $this->shuffle = $settings?->shuffle_enabled ?? config('radio.playlist_shuffle', true);
-        $this->enabled = $settings?->is_enabled ?? true;
-        $this->tempUrlTtlMinutes = config('radio.temp_url_ttl_minutes', 60);
-        $this->loop = $settings?->loop_enabled ?? config('radio.loop', true);
-        $this->gapMs = $settings?->gap_ms ?? config('radio.gap_ms', 500);
-        $this->listenerTtlSeconds = $settings?->listener_ttl_seconds ?? config('radio.listener_ttl_seconds', 120);
+        $this->icyMetaint = (int) ($settings?->icy_metaint ?? config('radio.icy_metaint', 8192));
+        $this->chunkSize = (int) config('radio.chunk_size', 8192);
+        $this->historyLimit = (int) ($settings?->history_limit ?? config('radio.history_limit', 20));
+        $this->shuffle = (bool) ($settings?->shuffle_enabled ?? config('radio.playlist_shuffle', true));
+        $this->enabled = (bool) ($settings?->is_enabled ?? true);
+        $this->tempUrlTtlMinutes = (int) config('radio.temp_url_ttl_minutes', 60);
+        $this->loop = (bool) ($settings?->loop_enabled ?? config('radio.loop', true));
+        $this->gapMs = (int) ($settings?->gap_ms ?? config('radio.gap_ms', 500));
+        $this->listenerTtlSeconds = (int) ($settings?->listener_ttl_seconds ?? config('radio.listener_ttl_seconds', 120));
         $this->maxListenersDisplay = $settings?->max_listeners_display;
     }
 
