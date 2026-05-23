@@ -61,7 +61,6 @@ use App\Mail\Transports\MailServerTransport;
 use App\Services\Mail\MailServerService;
 use App\Services\Storage\SignedUrlService;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Mail\MailManager;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\Event;
@@ -116,7 +115,6 @@ class AppServiceProvider extends ServiceProvider
 
         Event::listen(SoundPublished::class, SendNewSoundPushNotification::class);
         Event::listen(DiscordNotification::class, DispatchDiscordNotification::class);
-        Event::listen(Registered::class, SendEmailVerificationNotification::class);
         Event::listen(Registered::class, NotifyDiscordOnRegistration::class);
         Event::listen(SocialiteWasCalled::class, DiscordExtendSocialite::class);
 
