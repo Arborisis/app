@@ -14,6 +14,7 @@ RUN apk add --no-cache \
     libzip-dev \
     postgresql-dev \
     icu-dev \
+    oniguruma-dev \
     zip \
     unzip \
     git \
@@ -35,7 +36,10 @@ RUN docker-php-ext-install \
     intl
 
 # Installer Redis
-RUN pecl install redis && docker-php-ext-enable redis
+RUN apk add --no-cache autoconf make gcc musl-dev \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && apk del autoconf make gcc musl-dev
 
 # Installer Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
