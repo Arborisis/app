@@ -1,0 +1,104 @@
+# =============================================================================
+# Arborisis — Dockerfile Production (PHP-FPM + Nginx + Supervisor)
+# =============================================================================
+
+FROM php:8.4-fpm-alpine
+
+# Installer les dépendances système
+RUN apk add --no-cache \
+    nginx \
+    supervisor \
+    curl \
+    libpng-dev \
+    libxml2-dev \
+    libzip-dev \
+    postgresql-dev \
+    icu-dev \
+    zip \
+    unzip \
+    git \
+    nodejs \
+    npm \
+    envsubst
+
+# Installer les extensions PHP
+RUN docker-php-ext-install \
+    pdo \
+    pdo_pgsql \
+    mbstring \
+    exif \
+    pcntl \
+    bcmath \
+    gd \
+    zip \
+    opcache \
+    intl
+
+# Installer Redis
+RUN pecl install redis && docker-php-ext-enable redis
+
+# Installer Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Configurer PHP-FPM
+COPY docker/php/www.conf /usr/local/etc/php-fpm.d/www.conf
+COPY docker/php/php.ini /usr/local/etc/php/php.ini
+COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+COPY docker/php/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+
+# Configurer Nginx
+COPY docker/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY docker/nginx/site.conf /etc/nginx/http.d/default.conf
+
+# Configurer Supervisor
+COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Copier le script d'entrée
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Définir le répertoire de travail
+WORKDIR /var/www/html
+
+# Copier les fichiers de dépendances
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts --no-autoloader
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# Copier le code source
+COPY . .
+
+# Créer les répertoires de stockage
+RUN mkdir -p \
+    storage/framework/cache/data \
+    storage/framework/sessions \
+    storage/framework/views \
+    storage/framework/testing \
+    storage/logs \
+    storage/app/public \
+    bootstrap/cache \
+    public/build
+
+# Builder les assets
+RUN npm run build
+
+# Finaliser l'installation Composer
+RUN composer dump-autoload --optimize --no-scripts
+
+# Permissions
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 775 storage bootstrap/cache
+
+# Exposer le port
+ENV PORT=8080
+EXPOSE 8080
+
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -fs http://localhost:${PORT}/health || exit 1
+
+# Entrypoint
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
