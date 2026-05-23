@@ -79,9 +79,14 @@ return [
             'transport' => 'array',
         ],
 
+        'mailserver' => [
+            'transport' => 'mailserver',
+        ],
+
         'failover' => [
             'transport' => 'failover',
             'mailers' => [
+                'mailserver',
                 'smtp',
                 'log',
             ],

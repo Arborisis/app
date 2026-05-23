@@ -57,9 +57,12 @@ use App\Policies\ChatMessagePolicy;
 use App\Policies\ChatRoomPolicy;
 use App\Policies\ContactTicketPolicy;
 use App\Policies\HelpdeskTicketPolicy;
+use App\Mail\Transports\MailServerTransport;
+use App\Services\Mail\MailServerService;
 use App\Services\Storage\SignedUrlService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
+use Illuminate\Mail\MailManager;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
@@ -81,6 +84,11 @@ class AppServiceProvider extends ServiceProvider
                 signingKey: (string) config('services.r2.signing_key', ''),
                 customDomain: rtrim((string) config('filesystems.disks.r2.url', ''), '/'),
             );
+        });
+
+        // Enregistrer le transport mail personnalisé
+        $this->app->singleton(MailServerService::class, function () {
+            return new MailServerService();
         });
     }
 
@@ -219,6 +227,17 @@ class AppServiceProvider extends ServiceProvider
 
         RateLimiter::for('helpdesk', function ($request) {
             return Limit::perMinute(20)->by($request->user()?->id ?: $request->ip());
+        });
+
+        // Enregistrer le transport mailserver pour Laravel
+        $this->app->extend('mail.manager', function (MailManager $manager) {
+            $manager->extend('mailserver', function () {
+                return new MailServerTransport(
+                    $this->app->make(MailServerService::class)
+                );
+            });
+
+            return $manager;
         });
     }
 }

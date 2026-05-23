@@ -156,4 +156,17 @@ return [
         'current_refresh_minutes' => env('OPEN_METEO_CURRENT_REFRESH_MINUTES', 15),
     ],
 
+    'mail_server' => [
+        'url' => env('MAIL_SERVER_URL'),
+        'token' => env('MAIL_SERVER_TOKEN'),
+        'from_address' => env('MAIL_FROM_ADDRESS', 'contact@arborisis.com'),
+        'from_name' => env('MAIL_FROM_NAME', 'Arborisis'),
+    ],
+
+    'radio_server' => [
+        'url' => env('RADIO_SERVER_URL'),
+        'internal_token' => env('RADIO_INTERNAL_TOKEN'),
+        'public_stream_url' => env('RADIO_PUBLIC_STREAM_URL'),
+    ],
+
 ];
