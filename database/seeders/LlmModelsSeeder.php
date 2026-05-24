@@ -11,6 +11,25 @@ class LlmModelsSeeder extends Seeder
     {
         $models = [
             [
+                'name' => 'Sylve',
+                'slug' => 'sylve',
+                'description' => 'Modèle Sylve - Assistant IA Arborisis (alias Gemma 4)',
+                'type' => 'local',
+                'status' => 'active',
+                'requirements' => [
+                    'min_cpu_cores' => 4,
+                    'min_memory_gb' => 8,
+                    'requires_gpu' => false,
+                ],
+                'config' => [
+                    'model_path' => '/models/gemma-4.gguf',
+                    'context_length' => 8192,
+                    'quantization' => 'Q4_K_M',
+                ],
+                'fallback_model' => 'claude-opus',
+                'is_default' => true,
+            ],
+            [
                 'name' => 'Gemma 4',
                 'slug' => 'gemma-4',
                 'description' => 'Modèle Gemma 4 - Assistant Sylve (local)',

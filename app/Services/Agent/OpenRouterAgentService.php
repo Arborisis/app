@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\Contact\ContactTicketService;
 use App\Services\Gamification\ArborisisPointService;
 use App\Services\Gamification\SoundWalkService;
+use App\Services\LlmClusterService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -27,6 +28,7 @@ class OpenRouterAgentService
         private readonly ArborisisPointService $pointService,
         private readonly SoundWalkService $soundWalkService,
         private readonly ContactTicketService $ticketService,
+        private readonly LlmClusterService $llmClusterService,
     ) {}
 
     /**
@@ -128,6 +130,33 @@ class OpenRouterAgentService
      */
     private function callOpenRouter(array $messages, bool $withTools): array
     {
+        // Essayer le cluster LLM d'abord pour les appels sans tools
+        if (! $withTools) {
+            try {
+                $clusterResult = $this->callCluster($messages);
+                if ($clusterResult !== null) {
+                    return [
+                        'choices' => [
+                            [
+                                'message' => [
+                                    'role' => 'assistant',
+                                    'content' => $clusterResult,
+                                ],
+                            ],
+                        ],
+                        'usage' => [
+                            'prompt_tokens' => 0,
+                            'completion_tokens' => 0,
+                            'total_tokens' => 0,
+                        ],
+                        'model' => 'sylve-cluster',
+                    ];
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Sylve cluster fallback failed', ['error' => $e->getMessage()]);
+            }
+        }
+
         $apiKey = (string) config('services.openrouter.api_key');
         $baseUrl = rtrim((string) config('services.openrouter.base_url', 'https://openrouter.ai/api/v1'), '/');
         $model = (string) config('services.openrouter.model', 'anthropic/claude-opus-4.7');
@@ -167,6 +196,108 @@ class OpenRouterAgentService
         }
 
         return $response->json();
+    }
+
+    /**
+     * Appelle le cluster LLM pour Sylve avec polling synchrone.
+     *
+     * @param  array<int, array{role: string, content: string}>  $messages
+     */
+    private function callCluster(array $messages): ?string
+    {
+        $prompt = $this->formatMessagesToPrompt($messages);
+
+        $job = $this->llmClusterService->createInferenceJob($prompt, [
+            'model' => 'sylve',
+            'temperature' => 0.35,
+            'max_tokens' => 2500,
+            'top_p' => 0.9,
+        ]);
+
+        if (! $job) {
+            Log::warning('Failed to create Sylve cluster job');
+
+            return null;
+        }
+
+        // Si API direct (fallback configuré dans le cluster)
+        if ($job->status === 'completed') {
+            return $job->response;
+        }
+
+        // Polling pour les jobs locaux
+        $startTime = time();
+        $maxWait = 45;
+        $earlyAbortSeconds = 10;
+
+        while (time() - $startTime < $maxWait) {
+            sleep(2);
+
+            $job->refresh();
+
+            if ($job->status === 'completed') {
+                return $job->response;
+            }
+
+            if ($job->status === 'failed') {
+                throw new \RuntimeException('Cluster job failed: '.($job->error_message ?? 'Unknown error'));
+            }
+
+            // Si toujours en queue après 10s, vérifier si un worker est disponible
+            if ($job->status === 'queued' && (time() - $startTime) > $earlyAbortSeconds) {
+                $hasWorker = \App\Models\LlmWorker::whereIn('status', ['online', 'busy'])
+                    ->where('last_heartbeat', '>', now()->subMinutes(2))
+                    ->exists();
+
+                if (! $hasWorker) {
+                    Log::info('No LLM worker available, aborting cluster attempt early');
+
+                    return null;
+                }
+            }
+        }
+
+        Log::warning('Sylve cluster job timeout', ['job_id' => $job->id]);
+
+        return null;
+    }
+
+    /**
+     * Convertit les messages OpenAI en prompt texte pour llama.cpp.
+     *
+     * @param  array<int, array{role: string, content: string}>  $messages
+     */
+    private function formatMessagesToPrompt(array $messages): string
+    {
+        $parts = [];
+
+        foreach ($messages as $message) {
+            $role = $message['role'] ?? 'user';
+            $content = $message['content'] ?? '';
+
+            if ($role === 'system') {
+                $parts[] = "System: {$content}";
+            } elseif ($role === 'user') {
+                $parts[] = "User: {$content}";
+            } elseif ($role === 'assistant') {
+                if (isset($message['tool_calls'])) {
+                    $toolNames = collect($message['tool_calls'])
+                        ->map(fn ($call) => $call['function']['name'] ?? 'unknown')
+                        ->implode(', ');
+                    $parts[] = "Assistant: [Appelle les outils: {$toolNames}]";
+                } else {
+                    $parts[] = "Assistant: {$content}";
+                }
+            } elseif ($role === 'tool') {
+                $toolId = $message['tool_call_id'] ?? 'unknown';
+                $parts[] = "Tool result ({$toolId}): {$content}";
+            }
+        }
+
+        // Ajouter le prompt d'assistant pour la génération
+        $parts[] = 'Assistant:';
+
+        return implode("\n\n", $parts);
     }
 
     /**
