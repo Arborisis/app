@@ -209,7 +209,15 @@ class AudioWorkerController extends Controller
 
     public function getSetupScript(Request $request): \Illuminate\Http\Response
     {
-        $worker = AudioWorker::where('token', $request->bearerToken())->first();
+        // Support both Bearer token and query parameter
+        $token = $request->bearerToken() ?? $request->query('token');
+        
+        if (!$token) {
+            return response("# Error: No token provided\n# Usage: curl -fsSL 'https://arborisis.com/api/audio-workers/setup-script?token=YOUR_TOKEN' | bash\n", 401)
+                ->header('Content-Type', 'text/plain');
+        }
+
+        $worker = AudioWorker::where('token', $token)->first();
 
         if (!$worker) {
             return response("# Error: Worker not found\n# Please register a worker first at https://arborisis.com/audio-workers\n", 404)
