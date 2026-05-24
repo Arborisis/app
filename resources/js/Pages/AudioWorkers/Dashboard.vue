@@ -34,6 +34,54 @@ const form = ref({
 });
 
 const submitting = ref(false);
+const detecting = ref(false);
+
+const detectMachine = () => {
+    detecting.value = true;
+    
+    // Détection du hostname
+    const hostname = window.location.hostname || 'localhost';
+    const userAgent = navigator.userAgent;
+    
+    // Détection du OS
+    let osName = 'Machine';
+    if (userAgent.includes('Mac')) osName = 'Mac';
+    else if (userAgent.includes('Win')) osName = 'Windows';
+    else if (userAgent.includes('Linux')) osName = 'Linux';
+    
+    // Détection CPU
+    const cpuCores = navigator.hardwareConcurrency || 4;
+    
+    // Détection RAM (en GB, approximatif)
+    const memoryGB = navigator.deviceMemory || 8;
+    
+    // Génération d'un nom unique
+    const timestamp = new Date().getTime().toString(36).slice(-4);
+    const random = Math.random().toString(36).substring(2, 6);
+    const uniqueName = `${osName}-${timestamp}${random}`;
+    
+    form.value = {
+        name: uniqueName,
+        hostname: hostname,
+        cpu_cores: cpuCores,
+        memory_gb: memoryGB,
+        has_gpu: false,
+        gpu_model: ''
+    };
+    
+    detecting.value = false;
+};
+
+const resetForm = () => {
+    form.value = {
+        name: '',
+        hostname: '',
+        cpu_cores: 4,
+        memory_gb: 8,
+        has_gpu: false,
+        gpu_model: ''
+    };
+};
 
 const statusColors = {
     online: 'bg-green-100 text-green-800',
@@ -142,35 +190,58 @@ const busyWorkers = computed(() => props.workers.filter(w => w.status === 'busy'
 
                 <!-- Form -->
                 <div v-if="showForm" class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 mb-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Nouvelle machine</h2>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold text-gray-900">Nouvelle machine</h2>
+                        <div class="flex gap-2">
+                            <button
+                                type="button"
+                                @click="detectMachine"
+                                :disabled="detecting"
+                                class="inline-flex items-center px-3 py-1.5 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150 disabled:opacity-50"
+                            >
+                                {{ detecting ? 'Détection...' : 'Détecter auto' }}
+                            </button>
+                            <button
+                                type="button"
+                                @click="resetForm"
+                                class="inline-flex items-center px-3 py-1.5 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                            >
+                                Réinitialiser
+                            </button>
+                        </div>
+                    </div>
+                    
                     <form @submit.prevent="submitForm">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Nom</label>
-                                <input v-model="form.name" type="text" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                <label class="block text-sm font-medium text-gray-700">Nom <span class="text-red-500">*</span></label>
+                                <input v-model="form.name" type="text" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Mac-abc123">
+                                <p class="mt-1 text-xs text-gray-500">Nom unique pour identifier cette machine</p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Hostname</label>
-                                <input v-model="form.hostname" type="text" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                <input v-model="form.hostname" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="macsan2stic">
+                                <p class="mt-1 text-xs text-gray-500">Optionnel - hostname de la machine</p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Cœurs CPU</label>
-                                <input v-model.number="form.cpu_cores" type="number" min="1" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                <label class="block text-sm font-medium text-gray-700">Cœurs CPU <span class="text-red-500">*</span></label>
+                                <input v-model.number="form.cpu_cores" type="number" min="1" max="128" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Mémoire (GB)</label>
-                                <input v-model.number="form.memory_gb" type="number" min="1" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                <label class="block text-sm font-medium text-gray-700">Mémoire (GB) <span class="text-red-500">*</span></label>
+                                <input v-model.number="form.memory_gb" type="number" min="1" max="512" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                             </div>
-                            <div class="flex items-center">
-                                <input v-model="form.has_gpu" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                <label class="ml-2 block text-sm font-medium text-gray-700">GPU disponible</label>
+                            <div class="flex items-center md:col-span-2">
+                                <input v-model="form.has_gpu" id="has_gpu" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                <label for="has_gpu" class="ml-2 block text-sm font-medium text-gray-700">GPU disponible (NVIDIA / MPS Mac)</label>
                             </div>
-                            <div v-if="form.has_gpu">
+                            <div v-if="form.has_gpu" class="md:col-span-2">
                                 <label class="block text-sm font-medium text-gray-700">Modèle GPU</label>
-                                <input v-model="form.gpu_model" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                <input v-model="form.gpu_model" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="RTX 4090, Apple M3, etc.">
                             </div>
                         </div>
-                        <div class="mt-6">
+                        <div class="mt-6 flex items-center justify-between">
+                            <p class="text-sm text-gray-500"><span class="text-red-500">*</span> Champs requis</p>
                             <button
                                 type="submit"
                                 :disabled="submitting"

@@ -23,10 +23,10 @@ class AudioWorkerController extends Controller
     public function register(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'hostname' => 'required|string|max:255|unique:audio_workers,hostname',
-            'cpu_cores' => 'required|integer|min:1',
-            'memory_gb' => 'required|integer|min:1',
+            'name' => 'required|string|max:255|unique:audio_workers,name',
+            'hostname' => 'nullable|string|max:255',
+            'cpu_cores' => 'required|integer|min:1|max:128',
+            'memory_gb' => 'required|integer|min:1|max:512',
             'has_gpu' => 'boolean',
             'gpu_model' => 'nullable|string|max:255',
             'os' => 'nullable|string|max:255',
