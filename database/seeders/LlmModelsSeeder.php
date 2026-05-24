@@ -11,9 +11,9 @@ class LlmModelsSeeder extends Seeder
     {
         $models = [
             [
-                'name' => 'Sylve',
-                'slug' => 'sylve',
-                'description' => 'Modèle LLM local optimisé pour les conversations naturelles et l\'analyse audio',
+                'name' => 'Gemma 4',
+                'slug' => 'gemma-4',
+                'description' => 'Modèle Gemma 4 - Assistant Sylve (local)',
                 'type' => 'local',
                 'status' => 'active',
                 'requirements' => [
@@ -22,7 +22,7 @@ class LlmModelsSeeder extends Seeder
                     'requires_gpu' => false,
                 ],
                 'config' => [
-                    'model_path' => '/models/sylve.gguf',
+                    'model_path' => '/models/gemma-4.gguf',
                     'context_length' => 8192,
                     'quantization' => 'Q4_K_M',
                 ],
@@ -30,9 +30,9 @@ class LlmModelsSeeder extends Seeder
                 'is_default' => true,
             ],
             [
-                'name' => 'Sylve GPU',
-                'slug' => 'sylve-gpu',
-                'description' => 'Version GPU de Sylve avec accélération CUDA',
+                'name' => 'Gemma 4 GPU',
+                'slug' => 'gemma-4-gpu',
+                'description' => 'Gemma 4 avec accélération GPU - Assistant Sylve',
                 'type' => 'local',
                 'status' => 'active',
                 'requirements' => [
@@ -42,18 +42,18 @@ class LlmModelsSeeder extends Seeder
                     'min_vram_gb' => 8,
                 ],
                 'config' => [
-                    'model_path' => '/models/sylve.gguf',
+                    'model_path' => '/models/gemma-4.gguf',
                     'context_length' => 32768,
                     'quantization' => 'Q5_K_M',
                     'gpu_layers' => -1,
                 ],
-                'fallback_model' => 'sylve',
+                'fallback_model' => 'gemma-4',
                 'is_default' => false,
             ],
             [
-                'name' => 'Sylve Mini',
-                'slug' => 'sylve-mini',
-                'description' => 'Version légère de Sylve pour machines modestes',
+                'name' => 'Gemma 4 Mini',
+                'slug' => 'gemma-4-mini',
+                'description' => 'Gemma 4 allégé pour machines modestes - Assistant Sylve',
                 'type' => 'local',
                 'status' => 'active',
                 'requirements' => [
@@ -62,11 +62,11 @@ class LlmModelsSeeder extends Seeder
                     'requires_gpu' => false,
                 ],
                 'config' => [
-                    'model_path' => '/models/sylve-mini.gguf',
+                    'model_path' => '/models/gemma-4-mini.gguf',
                     'context_length' => 4096,
                     'quantization' => 'Q3_K_S',
                 ],
-                'fallback_model' => 'sylve',
+                'fallback_model' => 'gemma-4',
                 'is_default' => false,
             ],
             [
