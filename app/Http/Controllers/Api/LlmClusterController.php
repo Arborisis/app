@@ -23,7 +23,7 @@ class LlmClusterController extends Controller
      */
     public function listModels(): JsonResponse
     {
-        $models = LlmModel::active()-/>get();
+        $models = LlmModel::active()->get();
 
         return response()->json([
             'models' => $models->map(function ($model) {
