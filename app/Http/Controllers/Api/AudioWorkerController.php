@@ -259,6 +259,7 @@ curl -fsSL "\$GITHUB_RAW/audio_analyzer.py" -o audio_analyzer.py
 curl -fsSL "\$GITHUB_RAW/config.py" -o config.py
 curl -fsSL "\$GITHUB_RAW/infrastructure.py" -o infrastructure.py
 curl -fsSL "\$GITHUB_RAW/cluster_tasks.py" -o cluster_tasks.py
+curl -fsSL "\$GITHUB_RAW/auto_updater.py" -o auto_updater.py
 curl -fsSL "\$GITHUB_RAW/requirements.txt" -o requirements.txt
 
 # Create config
