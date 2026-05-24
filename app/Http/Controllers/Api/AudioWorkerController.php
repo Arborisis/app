@@ -1,0 +1,215 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\AudioWorker;
+use App\Models\AudioWorkerAssignment;
+use App\Models\SoundAnalysis;
+use App\Services\AudioWorkerDispatchService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+
+class AudioWorkerController extends Controller
+{
+    public function __construct(
+        private AudioWorkerDispatchService $dispatchService
+    ) {}
+
+    public function register(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'hostname' => 'required|string|max:255|unique:audio_workers,hostname',
+            'cpu_cores' => 'required|integer|min:1',
+            'memory_gb' => 'required|integer|min:1',
+            'has_gpu' => 'boolean',
+            'gpu_model' => 'nullable|string|max:255',
+            'os' => 'nullable|string|max:255',
+            'capabilities' => 'nullable|array',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $worker = AudioWorker::create([
+            'user_id' => $request->user()->id,
+            'name' => $request->input('name'),
+            'hostname' => $request->input('hostname'),
+            'token' => hash('sha256', Str::random(64)),
+            'status' => 'pending',
+            'cpu_cores' => $request->input('cpu_cores'),
+            'memory_gb' => $request->input('memory_gb'),
+            'has_gpu' => $request->input('has_gpu', false),
+            'gpu_model' => $request->input('gpu_model'),
+            'os' => $request->input('os'),
+            'capabilities' => $request->input('capabilities', []),
+        ]);
+
+        return response()->json([
+            'worker' => $worker,
+            'token' => $worker->token,
+            'setup_command' => $this->getSetupCommand($worker),
+        ], 201);
+    }
+
+    public function heartbeat(Request $request): JsonResponse
+    {
+        $worker = AudioWorker::where('token', $request->bearerToken())->first();
+
+        if (!$worker) {
+            return response()->json(['error' => 'Worker not found'], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'cpu_usage' => 'nullable|numeric|min:0|max:100',
+            'memory_usage' => 'nullable|numeric|min:0|max:100',
+            'current_jobs' => 'nullable|integer|min:0',
+            'ip_address' => 'nullable|ip',
+            'port' => 'nullable|integer|min:1|max:65535',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $status = $request->input('current_jobs', 0) > 0 ? 'busy' : 'online';
+        
+        $worker->update([
+            'status' => $status,
+            'last_seen_at' => now(),
+            'ip_address' => $request->input('ip_address', $worker->ip_address),
+            'port' => $request->input('port', $worker->port),
+        ]);
+
+        $pendingJobs = AudioWorkerAssignment::where('audio_worker_id', $worker->id)
+            ->where('status', 'assigned')
+            ->with('soundAnalysis')
+            ->get();
+
+        return response()->json([
+            'status' => 'ok',
+            'pending_jobs' => $pendingJobs->map(function ($assignment) {
+                return [
+                    'assignment_id' => $assignment->id,
+                    'analysis_id' => $assignment->sound_analysis_id,
+                    'r2_key' => $assignment->soundAnalysis->original_r2_key,
+                    'parameters' => $assignment->soundAnalysis->parameters_json,
+                ];
+            }),
+        ]);
+    }
+
+    public function requestJob(Request $request): JsonResponse
+    {
+        $worker = AudioWorker::where('token', $request->bearerToken())->first();
+
+        if (!$worker || !$worker->isAvailable()) {
+            return response()->json(['error' => 'Worker not available'], 403);
+        }
+
+        $job = $this->dispatchService->assignNextJob($worker);
+
+        if (!$job) {
+            return response()->json(['job' => null], 204);
+        }
+
+        return response()->json([
+            'job' => [
+                'assignment_id' => $job->id,
+                'analysis_id' => $job->sound_analysis_id,
+                'r2_key' => $job->soundAnalysis->original_r2_key,
+                'parameters' => $job->soundAnalysis->parameters_json,
+            ],
+        ]);
+    }
+
+    public function submitResult(Request $request, int $assignmentId): JsonResponse
+    {
+        $worker = AudioWorker::where('token', $request->bearerToken())->first();
+
+        if (!$worker) {
+            return response()->json(['error' => 'Worker not found'], 404);
+        }
+
+        $assignment = AudioWorkerAssignment::where('id', $assignmentId)
+            ->where('audio_worker_id', $worker->id)
+            ->first();
+
+        if (!$assignment) {
+            return response()->json(['error' => 'Assignment not found'], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'status' => 'required|in:completed,failed',
+            'processing_time_seconds' => 'required|integer|min:0',
+            'results' => 'nullable|array',
+            'error_message' => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        if ($request->input('status') === 'completed') {
+            $assignment->markCompleted($request->input('processing_time_seconds'));
+            
+            $worker->increment('total_jobs_completed');
+            $worker->update([
+                'avg_processing_time' => ($worker->avg_processing_time * $worker->total_jobs_completed + $request->input('processing_time_seconds')) / ($worker->total_jobs_completed + 1),
+            ]);
+
+            $analysis = $assignment->soundAnalysis;
+            if ($analysis) {
+                $analysis->markCompleted();
+            }
+        } else {
+            $assignment->markFailed($request->input('error_message', 'Unknown error'));
+            $worker->increment('total_jobs_failed');
+
+            $analysis = $assignment->soundAnalysis;
+            if ($analysis) {
+                $analysis->markFailed('worker_error', $request->input('error_message'));
+            }
+        }
+
+        return response()->json(['status' => 'ok']);
+    }
+
+    public function list(Request $request): JsonResponse
+    {
+        $workers = AudioWorker::forUser($request->user()->id)
+            ->withCount(['assignments' => function ($query) {
+                $query->whereIn('status', ['assigned', 'processing']);
+            }])
+            ->get();
+
+        return response()->json($workers);
+    }
+
+    public function destroy(Request $request, int $id): JsonResponse
+    {
+        $worker = AudioWorker::forUser($request->user()->id)
+            ->where('id', $id)
+            ->first();
+
+        if (!$worker) {
+            return response()->json(['error' => 'Worker not found'], 404);
+        }
+
+        $worker->delete();
+
+        return response()->json(['status' => 'deleted']);
+    }
+
+    private function getSetupCommand(AudioWorker $worker): string
+    {
+        $apiUrl = config('app.url');
+        return "curl -fsSL {$apiUrl}/api/audio-workers/setup-script | WORKER_TOKEN={$worker->token} bash";
+    }
+}

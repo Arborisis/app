@@ -37,6 +37,7 @@ use App\Http\Controllers\Web\SocialListController;
 use App\Http\Controllers\Web\SoundController;
 use App\Http\Controllers\Web\SoundWalkController;
 use App\Http\Controllers\Web\WalletController;
+use App\Http\Controllers\Web\AudioWorkerDashboardController;
 use App\Http\Controllers\Web\XenoCantoSubmissionController;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -239,6 +240,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/wallet/checkout', [WalletController::class, 'checkout'])->name('wallet.checkout');
     Route::get('/wallet/success', [WalletController::class, 'success'])->name('wallet.success');
     Route::get('/wallet/cancel', [WalletController::class, 'cancel'])->name('wallet.cancel');
+
+    // Audio Workers Dashboard
+    Route::get('/audio-workers', [AudioWorkerDashboardController::class, 'index'])->name('audio-workers.index');
+    Route::post('/audio-workers', [AudioWorkerDashboardController::class, 'store'])->name('audio-workers.store');
+    Route::delete('/audio-workers/{id}', [AudioWorkerDashboardController::class, 'destroy'])->name('audio-workers.destroy');
+    Route::get('/audio-workers/{id}/setup', [AudioWorkerDashboardController::class, 'getSetupScript'])->name('audio-workers.setup');
 
     // ECHO Donations
     Route::post('/donations', [EchoDonationController::class, 'store'])->name('donations.store');

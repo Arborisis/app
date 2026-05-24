@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\HealthRadioController;
 use App\Http\Controllers\Api\HelpdeskController;
 use App\Http\Controllers\Api\InboundContactTicketReplyController;
 use App\Http\Controllers\Api\Internal\WikiOAuthController;
+use App\Http\Controllers\Api\AudioWorkerController;
 use App\Http\Controllers\Api\InternalAudioAnalysisController;
 use App\Http\Controllers\Api\InternalDiscordController;
 use App\Http\Controllers\Api\InternalRadioController;
@@ -276,6 +277,19 @@ Route::middleware(['web', 'auth', 'throttle:helpdesk'])->prefix('helpdesk')->gro
     Route::post('/{ticket}/reopen', [HelpdeskController::class, 'reopen'])->name('api.helpdesk.reopen');
     Route::post('/{ticket}/ia-suggest', [HelpdeskController::class, 'generateIaSuggestion'])->name('api.helpdesk.ia-suggest');
     Route::post('/ia-suggestions/{suggestion}/validate', [HelpdeskController::class, 'validateIaSuggestion'])->name('api.helpdesk.ia-validate');
+});
+
+// Audio Workers API
+Route::middleware(['auth:sanctum'])->prefix('audio-workers')->group(function () {
+    Route::get('/', [AudioWorkerController::class, 'list'])->name('api.audio-workers.list');
+    Route::post('/', [AudioWorkerController::class, 'register'])->name('api.audio-workers.register');
+    Route::delete('/{id}', [AudioWorkerController::class, 'destroy'])->name('api.audio-workers.destroy');
+});
+
+Route::middleware(['auth:sanctum'])->prefix('audio-workers')->group(function () {
+    Route::post('/heartbeat', [AudioWorkerController::class, 'heartbeat'])->name('api.audio-workers.heartbeat');
+    Route::get('/job', [AudioWorkerController::class, 'requestJob'])->name('api.audio-workers.job');
+    Route::post('/assignments/{assignmentId}/result', [AudioWorkerController::class, 'submitResult'])->name('api.audio-workers.result');
 });
 
 // Wiki.js OAuth2 SSO

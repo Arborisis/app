@@ -93,6 +93,11 @@ class SoundAnalysis extends Model
         return $this->hasMany(BirdnetDetection::class);
     }
 
+    public function workerAssignments(): HasMany
+    {
+        return $this->hasMany(AudioWorkerAssignment::class);
+    }
+
     public function markQueued(): void
     {
         $this->update([
