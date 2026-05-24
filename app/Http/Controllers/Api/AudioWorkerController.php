@@ -248,13 +248,13 @@ cd "\$WORKER_DIR"
 echo "Downloading worker files..."
 GITHUB_RAW="https://raw.githubusercontent.com/Arborisis/workers/main/arborisis-worker"
 
-curl -fsSL "$GITHUB_RAW/Dockerfile" -o Dockerfile
-curl -fsSL "$GITHUB_RAW/worker.py" -o worker.py
-curl -fsSL "$GITHUB_RAW/audio_analyzer.py" -o audio_analyzer.py
-curl -fsSL "$GITHUB_RAW/config.py" -o config.py
-curl -fsSL "$GITHUB_RAW/infrastructure.py" -o infrastructure.py
-curl -fsSL "$GITHUB_RAW/cluster_tasks.py" -o cluster_tasks.py
-curl -fsSL "$GITHUB_RAW/requirements.txt" -o requirements.txt
+curl -fsSL "\$GITHUB_RAW/Dockerfile" -o Dockerfile
+curl -fsSL "\$GITHUB_RAW/worker.py" -o worker.py
+curl -fsSL "\$GITHUB_RAW/audio_analyzer.py" -o audio_analyzer.py
+curl -fsSL "\$GITHUB_RAW/config.py" -o config.py
+curl -fsSL "\$GITHUB_RAW/infrastructure.py" -o infrastructure.py
+curl -fsSL "\$GITHUB_RAW/cluster_tasks.py" -o cluster_tasks.py
+curl -fsSL "\$GITHUB_RAW/requirements.txt" -o requirements.txt
 
 # Create config
 cat > .env << EOF
