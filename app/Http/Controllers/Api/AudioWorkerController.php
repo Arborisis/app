@@ -244,9 +244,17 @@ WORKER_DIR="\$HOME/.arborisis-worker"
 mkdir -p "\$WORKER_DIR"
 cd "\$WORKER_DIR"
 
-# Download worker image
-echo "Pulling worker image..."
-docker pull arborisis/audio-worker:latest
+# Download worker files from GitHub
+echo "Downloading worker files..."
+GITHUB_RAW="https://raw.githubusercontent.com/Arborisis/workers/main/arborisis-worker"
+
+curl -fsSL "$GITHUB_RAW/Dockerfile" -o Dockerfile
+curl -fsSL "$GITHUB_RAW/worker.py" -o worker.py
+curl -fsSL "$GITHUB_RAW/audio_analyzer.py" -o audio_analyzer.py
+curl -fsSL "$GITHUB_RAW/config.py" -o config.py
+curl -fsSL "$GITHUB_RAW/infrastructure.py" -o infrastructure.py
+curl -fsSL "$GITHUB_RAW/cluster_tasks.py" -o cluster_tasks.py
+curl -fsSL "$GITHUB_RAW/requirements.txt" -o requirements.txt
 
 # Create config
 cat > .env << EOF
@@ -255,6 +263,10 @@ API_URL={$apiUrl}
 WORKER_NAME={$workerName}
 WORKER_ID={$worker->id}
 EOF
+
+# Build image locally
+echo "Building worker image..."
+docker build -t arborisis/audio-worker:latest .
 
 # Create docker-compose for auto-restart
 cat > docker-compose.yml << 'EOF'
