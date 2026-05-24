@@ -289,7 +289,8 @@ Route::middleware(['auth:sanctum'])->prefix('audio-workers')->group(function () 
     Route::delete('/{id}', [AudioWorkerController::class, 'destroy'])->name('api.audio-workers.destroy');
 });
 
-Route::middleware(['auth:sanctum'])->prefix('audio-workers')->group(function () {
+// Worker-facing endpoints — auth handled internally by AudioWorkerController
+Route::prefix('audio-workers')->group(function () {
     Route::post('/heartbeat', [AudioWorkerController::class, 'heartbeat'])->name('api.audio-workers.heartbeat');
     Route::get('/job', [AudioWorkerController::class, 'requestJob'])->name('api.audio-workers.job');
     Route::post('/assignments/{assignmentId}/result', [AudioWorkerController::class, 'submitResult'])->name('api.audio-workers.result');
@@ -309,7 +310,7 @@ Route::middleware(['throttle:60,1'])->prefix('cluster')->group(function () {
 });
 
 // Cluster Worker Endpoints (for external workers)
-Route::middleware(['auth:sanctum'])->prefix('cluster/worker')->group(function () {
+Route::prefix('cluster/worker')->group(function () {
     Route::get('/task', [ClusterController::class, 'requestClusterTask'])->name('api.cluster.worker.task');
     Route::post('/tasks/{taskId}/result', [ClusterController::class, 'submitClusterResult'])
         ->name('api.cluster.worker.result');
@@ -325,7 +326,7 @@ Route::middleware(['throttle:60,1'])->prefix('llm')->group(function () {
 });
 
 // LLM Cluster Worker Endpoints
-Route::middleware(['auth:sanctum'])->prefix('llm/worker')->group(function () {
+Route::prefix('llm/worker')->group(function () {
     Route::get('/job', [LlmClusterController::class, 'requestJob'])->name('api.llm.worker.job');
     Route::post('/jobs/{jobId}/result', [LlmClusterController::class, 'submitResult'])
         ->name('api.llm.worker.result');
