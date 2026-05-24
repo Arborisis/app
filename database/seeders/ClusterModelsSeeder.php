@@ -30,6 +30,26 @@ class ClusterModelsSeeder extends Seeder
                 'is_default' => true,
             ],
             [
+                'name' => 'Sylve CPU+',
+                'slug' => 'sylve-cpu-plus',
+                'description' => 'Version haute performance CPU pour machines avec 6+ cœurs et 16GB+ RAM',
+                'type' => 'local',
+                'status' => 'active',
+                'requirements' => [
+                    'min_cpu_cores' => 6,
+                    'min_memory_gb' => 16,
+                    'requires_gpu' => false,
+                ],
+                'config' => [
+                    'model_path' => '/models/sylve',
+                    'batch_size' => 2,
+                    'max_length' => 4096,
+                    'threads' => 6,
+                ],
+                'fallback_model' => 'sylve',
+                'is_default' => false,
+            ],
+            [
                 'name' => 'Sylve GPU',
                 'slug' => 'sylve-gpu',
                 'description' => 'Version GPU de Sylve pour inférence accélérée',

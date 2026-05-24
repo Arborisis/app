@@ -49,6 +49,26 @@ class LlmModelsSeeder extends Seeder
                 'is_default' => true,
             ],
             [
+                'name' => 'Gemma 4 CPU+',
+                'slug' => 'gemma-4-cpu-plus',
+                'description' => 'Gemma 4 haute performance CPU pour machines 6+ cœurs et 16GB+ RAM',
+                'type' => 'local',
+                'status' => 'active',
+                'requirements' => [
+                    'min_cpu_cores' => 6,
+                    'min_memory_gb' => 16,
+                    'requires_gpu' => false,
+                ],
+                'config' => [
+                    'model_path' => '/models/gemma-4.gguf',
+                    'context_length' => 16384,
+                    'quantization' => 'Q4_K_M',
+                    'threads' => 6,
+                ],
+                'fallback_model' => 'gemma-4',
+                'is_default' => false,
+            ],
+            [
                 'name' => 'Gemma 4 GPU',
                 'slug' => 'gemma-4-gpu',
                 'description' => 'Gemma 4 avec accélération GPU - Assistant Sylve',
