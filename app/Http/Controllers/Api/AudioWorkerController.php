@@ -237,7 +237,7 @@ class AudioWorkerController extends Controller
 #!/bin/bash
 set -e
 
-echo "=== Arborisis Audio Worker Setup ==="
+echo "=== Arborisis AI/LLM Worker Setup ==="
 echo "Worker: {$workerName}"
 echo ""
 
@@ -260,7 +260,11 @@ curl -fsSL "\$GITHUB_RAW/config.py" -o config.py
 curl -fsSL "\$GITHUB_RAW/infrastructure.py" -o infrastructure.py
 curl -fsSL "\$GITHUB_RAW/cluster_tasks.py" -o cluster_tasks.py
 curl -fsSL "\$GITHUB_RAW/auto_updater.py" -o auto_updater.py
+curl -fsSL "\$GITHUB_RAW/model_manager.py" -o model_manager.py
 curl -fsSL "\$GITHUB_RAW/requirements.txt" -o requirements.txt
+
+# Create directories
+mkdir -p models logs tmp
 
 # Create config
 cat > .env << EOF
@@ -268,32 +272,60 @@ WORKER_TOKEN={$workerToken}
 API_URL={$apiUrl}
 WORKER_NAME={$workerName}
 WORKER_ID={$worker->id}
+MODELS_DIR=/models
+DOWNLOAD_MODELS=gemma-4,gemma-4-mini
+INSTALL_GPU_DRIVERS=true
 EOF
+
+# Detect GPU
+GPU_FLAGS=""
+if command -v nvidia-smi &> /dev/null; then
+    echo "✅ NVIDIA GPU detected: $(nvidia-smi --query-gpu=name --format=csv,noheader | head -1)"
+    GPU_FLAGS="
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]"
+else
+    echo "ℹ️  No GPU detected - will run in CPU mode"
+fi
 
 # Build image locally
 echo "Building worker image..."
 docker build -t arborisis/audio-worker:latest .
 
 # Create docker-compose for auto-restart
-cat > docker-compose.yml << 'EOF'
+cat > docker-compose.yml << EOF
 services:
   audio-worker:
     image: arborisis/audio-worker:latest
     restart: unless-stopped
     env_file:
       - .env
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
     volumes:
       - ./tmp:/tmp/worker
       - ./logs:/app/logs
+      - ./models:/models
     logging:
       driver: json-file
       options:
         max-size: "10m"
-        max-file: "3"
+        max-file: "3"\${GPU_FLAGS}
 EOF
 
 echo ""
-echo "Setup complete!"
+echo "✅ Setup complete!"
+echo ""
+echo "Models will be downloaded automatically on first start:"
+echo "  - Gemma 4 (~4GB)"
+echo "  - Gemma 4 Mini (~2.5GB)"
+echo ""
 echo "To start the worker:"
 echo "  cd \$WORKER_DIR && docker compose up -d"
 echo ""
