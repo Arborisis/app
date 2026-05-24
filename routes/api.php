@@ -26,6 +26,7 @@ use App\Http\Controllers\Api\InboundContactTicketReplyController;
 use App\Http\Controllers\Api\Internal\WikiOAuthController;
 use App\Http\Controllers\Api\AudioWorkerController;
 use App\Http\Controllers\Api\AudioWorkerHealthController;
+use App\Http\Controllers\Api\ClusterController;
 use App\Http\Controllers\Api\InternalAudioAnalysisController;
 use App\Http\Controllers\Api\InternalDiscordController;
 use App\Http\Controllers\Api\InternalRadioController;
@@ -296,6 +297,22 @@ Route::middleware(['auth:sanctum'])->prefix('audio-workers')->group(function () 
 // Setup script - accessible via token in query param for easy curl
 Route::get('/audio-workers/setup-script', [AudioWorkerController::class, 'getSetupScript'])
     ->name('api.audio-workers.setup-script');
+
+// Cluster IA API
+Route::middleware(['throttle:60,1'])->prefix('cluster')->group(function () {
+    Route::get('/models', [ClusterController::class, 'listModels'])->name('api.cluster.models');
+    Route::get('/stats', [ClusterController::class, 'getStats'])->name('api.cluster.stats');
+    Route::get('/tasks', [ClusterController::class, 'listTasks'])->name('api.cluster.tasks');
+    Route::post('/tasks', [ClusterController::class, 'createTask'])->name('api.cluster.tasks.create');
+    Route::get('/tasks/{id}', [ClusterController::class, 'getTaskStatus'])->name('api.cluster.tasks.status');
+});
+
+// Cluster Worker Endpoints (for external workers)
+Route::middleware(['auth:sanctum'])->prefix('cluster/worker')->group(function () {
+    Route::get('/task', [ClusterController::class, 'requestClusterTask'])->name('api.cluster.worker.task');
+    Route::post('/tasks/{taskId}/result', [ClusterController::class, 'submitClusterResult'])
+        ->name('api.cluster.worker.result');
+});
 
 // Wiki.js OAuth2 SSO
 Route::prefix('internal/wiki/oauth')->middleware(['throttle:10,1'])->group(function () {
