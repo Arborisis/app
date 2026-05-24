@@ -291,4 +291,7 @@ require __DIR__.'/auth.php';
 // Audio Analysis — Orchestrator bridge (Cloudflare Queue → Laravel → Workers)
 Route::post('/audio-analysis/orchestrate', [\App\Http\Controllers\Api\InternalAudioAnalysisController::class, 'orchestrate'])
     ->name('api.audio-analysis.orchestrate')
-    ->middleware(\App\Http\Middleware\VerifyInternalApiToken::class);
+    ->middleware([\App\Http\Middleware\VerifyInternalApiToken::class])
+    ->withoutMiddleware([
+        \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
+    ]);
