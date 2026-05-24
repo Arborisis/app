@@ -232,6 +232,10 @@ class AudioWorkerController extends Controller
         $apiUrl = config('app.url');
         $workerToken = $worker->token;
         $workerName = $worker->name;
+        $r2Endpoint = config('filesystems.disks.r2.endpoint', '');
+        $r2Key = env('R2_ACCESS_KEY_ID', '');
+        $r2Secret = env('R2_SECRET_ACCESS_KEY', '');
+        $r2Bucket = env('R2_BUCKET', '');
 
         $script = <<<SCRIPT
 #!/bin/bash
@@ -275,6 +279,10 @@ WORKER_ID={$worker->id}
 MODELS_DIR=/models
 DOWNLOAD_MODELS=gemma-4,gemma-4-mini
 INSTALL_GPU_DRIVERS=true
+R2_ENDPOINT={$r2Endpoint}
+R2_ACCESS_KEY_ID={$r2Key}
+R2_SECRET_ACCESS_KEY={$r2Secret}
+R2_BUCKET_NAME={$r2Bucket}
 EOF
 
 # Detect GPU
