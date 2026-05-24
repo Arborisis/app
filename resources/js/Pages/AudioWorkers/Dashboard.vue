@@ -83,7 +83,7 @@ const openSetupModal = (worker) => {
 };
 
 const getSetupCommand = (worker) => {
-    return `curl -fsSL ${window.location.origin}/api/audio-workers/setup-script | WORKER_TOKEN=${worker.token} bash`;
+    return `curl -fsSL '${window.location.origin}/api/audio-workers/setup-script?token=${worker.token}' | bash`;
 };
 
 const copyToClipboard = async (text) => {
