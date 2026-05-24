@@ -47,6 +47,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/health', HealthController::class)->name('api.health');
 Route::get('/health/radio', HealthRadioController::class)->name('api.health.radio');
 
+// Test route to force route cache refresh
+Route::get('/internal/test', function () {
+    return response()->json(['status' => 'ok', 'timestamp' => now()->toIso8601String()]);
+})->name('api.internal.test');
+
 Route::post('/ai-agent/chat', ChatAgentController::class)
     ->middleware(['web', 'throttle:ai-agent-chat'])
     ->name('api.ai-agent.chat');
