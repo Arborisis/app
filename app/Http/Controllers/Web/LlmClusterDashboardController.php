@@ -18,7 +18,7 @@ class LlmClusterDashboardController extends Controller
     public function index()
     {
         $stats = $this->llmService->getStats();
-        $models = LlmModel::active()-/>get();
+        $models = LlmModel::active()->get();
 
         return Inertia::render('AudioWorkers/LlmCluster', [
             'stats' => $stats,
