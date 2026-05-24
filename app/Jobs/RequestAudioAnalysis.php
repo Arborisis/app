@@ -60,12 +60,6 @@ class RequestAudioAnalysis implements ShouldQueue
         $urls = $this->getAnalyzerUrls();
         $analyzerSecret = config('services.analyzer.secret');
 
-        Log::info('RequestAudioAnalysis: sending request', [
-            'token_length' => strlen($analyzerSecret),
-            'token_prefix' => substr($analyzerSecret, 0, 10),
-            'urls' => $urls,
-        ]);
-
         if (empty($urls) || empty($analyzerSecret)) {
             Log::error('RequestAudioAnalysis: analyzer URLs or secret not configured.');
 
