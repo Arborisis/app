@@ -31,7 +31,8 @@ class AudioAnalysisOrchestrationService
         }
 
         $analysis->fill([
-            'status' => AnalysisStatus::PENDING,
+            'status' => AnalysisStatus::QUEUED,
+            'queued_at' => now(),
             'attempts' => $analysis->attempts + 1,
             'failed_reason' => null,
             'error_message' => null,

@@ -143,7 +143,7 @@ class AudioAnalysisController extends Controller
             $force
         );
 
-        if ($force || $analysis->status === AnalysisStatus::PENDING) {
+        if ($force || in_array($analysis->status, [AnalysisStatus::PENDING, AnalysisStatus::QUEUED], true)) {
             $sound->loadMissing('soundFile');
             $soundFile = $sound->soundFile;
 
