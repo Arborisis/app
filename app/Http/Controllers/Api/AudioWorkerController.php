@@ -94,14 +94,19 @@ class AudioWorkerController extends Controller
 
         return response()->json([
             'status' => 'ok',
-            'pending_jobs' => $pendingJobs->map(function ($assignment) {
-                return [
-                    'assignment_id' => $assignment->id,
-                    'analysis_id' => $assignment->sound_analysis_id,
-                    'r2_key' => $assignment->soundAnalysis->original_r2_key,
-                    'parameters' => $assignment->soundAnalysis->parameters_json,
-                ];
-            }),
+            'pending_jobs' => $pendingJobs
+                ->filter(function ($assignment) {
+                    return $assignment->soundAnalysis !== null;
+                })
+                ->map(function ($assignment) {
+                    return [
+                        'assignment_id' => $assignment->id,
+                        'analysis_id' => $assignment->sound_analysis_id,
+                        'r2_key' => $assignment->soundAnalysis->original_r2_key,
+                        'parameters' => $assignment->soundAnalysis->parameters_json,
+                    ];
+                })
+                ->values(),
         ]);
     }
 
@@ -115,7 +120,7 @@ class AudioWorkerController extends Controller
 
         $job = $this->dispatchService->assignNextJob($worker);
 
-        if (!$job) {
+        if (!$job || !$job->soundAnalysis) {
             return response()->json(['job' => null], 204);
         }
 
