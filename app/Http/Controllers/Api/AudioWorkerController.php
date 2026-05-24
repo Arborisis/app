@@ -207,9 +207,78 @@ class AudioWorkerController extends Controller
         return response()->json(['status' => 'deleted']);
     }
 
-    private function getSetupCommand(AudioWorker $worker): string
+    public function getSetupScript(Request $request): \Illuminate\Http\Response
     {
+        $worker = AudioWorker::where('token', $request->bearerToken())->first();
+
+        if (!$worker) {
+            return response("# Error: Worker not found\n# Please register a worker first at https://arborisis.com/audio-workers\n", 404)
+                ->header('Content-Type', 'text/plain');
+        }
+
         $apiUrl = config('app.url');
-        return "curl -fsSL {$apiUrl}/api/audio-workers/setup-script | WORKER_TOKEN={$worker->token} bash";
+        $workerToken = $worker->token;
+        $workerName = $worker->name;
+
+        $script = <<<SCRIPT
+#!/bin/bash
+set -e
+
+echo "=== Arborisis Audio Worker Setup ==="
+echo "Worker: {$workerName}"
+echo ""
+
+# Check requirements
+command -v docker >/dev/null 2>&1 || { echo "Docker is required but not installed."; exit 1; }
+
+# Create worker directory
+WORKER_DIR="$HOME/.arborisis-worker"
+mkdir -p "$WORKER_DIR"
+cd "$WORKER_DIR"
+
+# Download worker image
+echo "Pulling worker image..."
+docker pull arborisis/audio-worker:latest
+
+# Create config
+cat > .env << EOF
+WORKER_TOKEN={$workerToken}
+API_URL={$apiUrl}
+WORKER_NAME={$workerName}
+WORKER_ID={$worker->id}
+EOF
+
+# Create docker-compose for auto-restart
+cat > docker-compose.yml << 'EOF'
+services:
+  audio-worker:
+    image: arborisis/audio-worker:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./tmp:/tmp/worker
+      - ./logs:/app/logs
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+EOF
+
+echo ""
+echo "Setup complete!"
+echo "To start the worker:"
+echo "  cd $WORKER_DIR && docker compose up -d"
+echo ""
+echo "To view logs:"
+echo "  docker compose logs -f"
+echo ""
+echo "To stop:"
+echo "  docker compose down"
+SCRIPT;
+
+        return response($script)
+            ->header('Content-Type', 'text/plain');
     }
 }

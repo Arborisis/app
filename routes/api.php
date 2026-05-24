@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\HelpdeskController;
 use App\Http\Controllers\Api\InboundContactTicketReplyController;
 use App\Http\Controllers\Api\Internal\WikiOAuthController;
 use App\Http\Controllers\Api\AudioWorkerController;
+use App\Http\Controllers\Api\AudioWorkerHealthController;
 use App\Http\Controllers\Api\InternalAudioAnalysisController;
 use App\Http\Controllers\Api\InternalDiscordController;
 use App\Http\Controllers\Api\InternalRadioController;
@@ -290,6 +291,7 @@ Route::middleware(['auth:sanctum'])->prefix('audio-workers')->group(function () 
     Route::post('/heartbeat', [AudioWorkerController::class, 'heartbeat'])->name('api.audio-workers.heartbeat');
     Route::get('/job', [AudioWorkerController::class, 'requestJob'])->name('api.audio-workers.job');
     Route::post('/assignments/{assignmentId}/result', [AudioWorkerController::class, 'submitResult'])->name('api.audio-workers.result');
+    Route::get('/setup-script', [AudioWorkerController::class, 'getSetupScript'])->name('api.audio-workers.setup-script');
 });
 
 // Wiki.js OAuth2 SSO
