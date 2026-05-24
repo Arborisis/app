@@ -235,6 +235,11 @@ Route::post('/internal/audio-analysis/callback', [InternalAudioAnalysisControlle
     ->name('api.internal.audio-analysis.callback')
     ->middleware(VerifyInternalApiToken::class);
 
+// Audio Analysis — Orchestrator bridge (Cloudflare Queue → Laravel → Workers)
+Route::post('/internal/audio-analysis/orchestrate', [InternalAudioAnalysisController::class, 'orchestrate'])
+    ->name('api.internal.audio-analysis.orchestrate')
+    ->middleware(VerifyInternalApiToken::class);
+
 // Audio Analysis — Public API
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/sounds/{sound}/analysis', [AudioAnalysisController::class, 'showApi'])
