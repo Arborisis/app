@@ -38,6 +38,7 @@ use App\Http\Controllers\Web\SoundController;
 use App\Http\Controllers\Web\SoundWalkController;
 use App\Http\Controllers\Web\WalletController;
 use App\Http\Controllers\Web\AudioWorkerDashboardController;
+use App\Http\Controllers\Web\ClusterDashboardController;
 use App\Http\Controllers\Web\XenoCantoSubmissionController;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -246,6 +247,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/audio-workers', [AudioWorkerDashboardController::class, 'store'])->name('audio-workers.store');
     Route::delete('/audio-workers/{id}', [AudioWorkerDashboardController::class, 'destroy'])->name('audio-workers.destroy');
     Route::get('/audio-workers/{id}/setup', [AudioWorkerDashboardController::class, 'getSetupScript'])->name('audio-workers.setup');
+
+    // Cluster IA Dashboard
+    Route::get('/cluster', [ClusterDashboardController::class, 'index'])->name('cluster.index');
 
     // ECHO Donations
     Route::post('/donations', [EchoDonationController::class, 'store'])->name('donations.store');
