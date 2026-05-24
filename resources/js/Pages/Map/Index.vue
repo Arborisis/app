@@ -61,8 +61,11 @@ const activeCategoryName = computed(() => {
 });
 
 /* ── Data fetching ──────────────────────────────────── */
+const fetchError = ref(null);
+
 const fetchSounds = async () => {
     loading.value = true;
+    fetchError.value = null;
     try {
         const params = new URLSearchParams();
         if (selectedCategory.value) {
@@ -70,10 +73,14 @@ const fetchSounds = async () => {
         }
 
         const response = await fetch(`/api/map/sounds?${params.toString()}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = await response.json();
         sounds.value = data.features ?? [];
     } catch (e) {
         console.error('Failed to load sounds:', e);
+        fetchError.value = 'Impossible de charger les sons. Veuillez réessayer.';
         sounds.value = [];
     } finally {
         loading.value = false;
@@ -395,9 +402,26 @@ onMounted(() => {
                             </div>
                         </div>
 
+                        <!-- Error state -->
+                        <div
+                            v-if="fetchError"
+                            class="p-6 text-center animate-scale-in"
+                        >
+                            <svg class="w-12 h-12 text-red-400/50 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <p class="text-sm text-red-300 mb-1">{{ fetchError }}</p>
+                            <button
+                                class="text-xs text-arbor-emerald hover:text-arbor-emerald-dark transition-colors font-medium mt-2"
+                                @click="fetchSounds()"
+                            >
+                                Réessayer →
+                            </button>
+                        </div>
+
                         <!-- Empty state inside sidebar -->
                         <div
-                            v-if="!loading && !hasSounds && !initialLoad"
+                            v-else-if="!loading && !hasSounds && !initialLoad"
                             class="p-6 text-center animate-scale-in"
                         >
                             <svg class="w-12 h-12 text-arbor-moss/30 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

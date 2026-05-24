@@ -94,7 +94,7 @@ class AudioWorker extends Model
 
     public function isAvailable(): bool
     {
-        return in_array($this->status, ['online', 'pending']) && $this->last_seen_at > now()->subMinutes(5);
+        return in_array($this->status, ['online', 'pending']) && $this->last_seen_at > now()->subMinutes(30);
     }
 
     public function getCapabilityScore(): int
@@ -113,7 +113,7 @@ class AudioWorker extends Model
     public function scopeAvailable($query)
     {
         return $query->whereIn('status', ['online', 'pending'])
-            ->where('last_seen_at', '>', now()->subMinutes(5));
+            ->where('last_seen_at', '>', now()->subMinutes(30));
     }
 
     public function scopeForUser($query, int $userId)

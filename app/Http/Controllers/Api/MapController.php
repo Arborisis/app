@@ -21,83 +21,109 @@ class MapController extends Controller
     {
         $cacheKey = $this->buildCacheKey($request);
 
-        $data = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($request): array {
-            $query = Sound::public()
-                ->select([
-                    'id', 'slug', 'title', 'description', 'duration',
-                    'user_id', 'category_id', 'play_count', 'like_count',
-                    'recorded_at', 'cover_image',
-                ])
-                ->with([
-                    'user:id,name',
-                    'category:id,name,slug',
-                    'soundLocation:id,sound_id,public_latitude,public_longitude,location_name',
-                    'soundFile:id,sound_id,path,disk',
-                ])
-                ->whereHas('soundLocation', function ($q) {
-                    $q->whereNotNull('public_latitude')
-                        ->whereNotNull('public_longitude');
-                });
-
-            // Geo bounds filtering for performance
-            if ($request->filled('bounds')) {
-                $bounds = $request->array('bounds');
-                if (isset($bounds['south'], $bounds['west'], $bounds['north'], $bounds['east'])) {
-                    $query->whereHas('soundLocation', function ($q) use ($bounds) {
-                        $q->whereBetween('public_latitude', [$bounds['south'], $bounds['north']])
-                            ->whereBetween('public_longitude', [$bounds['west'], $bounds['east']]);
+        try {
+            $data = Cache::remember($cacheKey, self::CACHE_TTL, function () use ($request): array {
+                $query = Sound::public()
+                    ->select([
+                        'id', 'slug', 'title', 'description', 'duration',
+                        'user_id', 'category_id', 'play_count', 'like_count',
+                        'recorded_at', 'cover_image',
+                    ])
+                    ->with([
+                        'user:id,name',
+                        'category:id,name,slug',
+                        'soundLocation:id,sound_id,public_latitude,public_longitude,location_name',
+                        'soundFile:id,sound_id,path,disk',
+                    ])
+                    ->whereHas('soundLocation', function ($q) {
+                        $q->whereNotNull('public_latitude')
+                            ->whereNotNull('public_longitude');
                     });
+
+                // Geo bounds filtering for performance
+                if ($request->filled('bounds')) {
+                    $bounds = $request->array('bounds');
+                    if (isset($bounds['south'], $bounds['west'], $bounds['north'], $bounds['east'])) {
+                        $query->whereHas('soundLocation', function ($q) use ($bounds) {
+                            $q->whereBetween('public_latitude', [$bounds['south'], $bounds['north']])
+                                ->whereBetween('public_longitude', [$bounds['west'], $bounds['east']]);
+                        });
+                    }
                 }
-            }
 
-            if ($request->filled('category')) {
-                $query->where('category_id', $request->integer('category'));
-            }
+                if ($request->filled('category')) {
+                    $query->where('category_id', $request->integer('category'));
+                }
 
-            if ($request->filled('environment')) {
-                $query->where('environment_id', $request->integer('environment'));
-            }
+                if ($request->filled('environment')) {
+                    $query->where('environment_id', $request->integer('environment'));
+                }
 
-            $sounds = $query->latest()
-                ->limit(self::MAX_SOUNDS)
-                ->get();
+                $sounds = $query->latest()
+                    ->limit(self::MAX_SOUNDS)
+                    ->get();
 
-            $features = $sounds->map(function (Sound $sound) {
-                $location = $sound->soundLocation;
+                $features = $sounds->map(function (Sound $sound) {
+                    $location = $sound->soundLocation;
+
+                    if (!$location) {
+                        return null;
+                    }
+
+                    try {
+                        $coverUrl = $sound->cover_url;
+                    } catch (\Exception $e) {
+                        $coverUrl = null;
+                    }
+
+                    return [
+                        'type' => 'Feature',
+                        'geometry' => [
+                            'type' => 'Point',
+                            'coordinates' => [
+                                (float) $location->public_longitude,
+                                (float) $location->public_latitude,
+                            ],
+                        ],
+                        'properties' => [
+                            'id' => $sound->id,
+                            'title' => $sound->title,
+                            'slug' => $sound->slug,
+                            'description' => $sound->description,
+                            'duration' => $sound->duration,
+                            'user_name' => $sound->user?->name ?? 'Anonyme',
+                            'category' => $sound->category?->name,
+                            'cover_url' => $coverUrl,
+                            'play_count' => $sound->play_count,
+                            'like_count' => $sound->like_count,
+                            'location_name' => $location->location_name,
+                            'recorded_at' => $sound->recorded_at?->toIso8601String(),
+                        ],
+                    ];
+                })->filter()->values();
 
                 return [
-                    'type' => 'Feature',
-                    'geometry' => [
-                        'type' => 'Point',
-                        'coordinates' => [
-                            (float) $location->public_longitude,
-                            (float) $location->public_latitude,
-                        ],
-                    ],
-                    'properties' => [
-                        'id' => $sound->id,
-                        'title' => $sound->title,
-                        'slug' => $sound->slug,
-                        'description' => $sound->description,
-                        'duration' => $sound->duration,
-                        'user_name' => $sound->user?->name ?? 'Anonyme',
-                        'category' => $sound->category?->name,
-                        'cover_url' => $sound->cover_url,
-                        'play_count' => $sound->play_count,
-                        'like_count' => $sound->like_count,
-                        'location_name' => $location->location_name,
-                        'recorded_at' => $sound->recorded_at?->toIso8601String(),
-                    ],
+                    'type' => 'FeatureCollection',
+                    'features' => $features,
                 ];
             });
 
-            return [
-                'type' => 'FeatureCollection',
-                'features' => $features,
-            ];
-        });
+            return response()->json($data);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Map sounds fetch failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
 
-        return response()->json($data);
+            // Clear cache to force refresh on next request
+            Cache::forget($cacheKey);
+
+            return response()->json([
+                'type' => 'FeatureCollection',
+                'features' => [],
+                'error' => 'Failed to load sounds',
+            ], 500);
+        }
     }
 
     public function search(SearchMapRequest $request): JsonResponse

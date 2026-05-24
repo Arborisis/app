@@ -16,7 +16,7 @@ class AudioWorkerDispatchService
 {
     private const MAX_ASSIGNMENT_ATTEMPTS = 3;
     private const TIMEOUT_MINUTES = 30;
-    private const HEARTBEAT_TIMEOUT_MINUTES = 5;
+    private const HEARTBEAT_TIMEOUT_MINUTES = 30;
 
     public function dispatchPendingJobs(): int
     {
