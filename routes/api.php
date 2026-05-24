@@ -27,6 +27,7 @@ use App\Http\Controllers\Api\Internal\WikiOAuthController;
 use App\Http\Controllers\Api\AudioWorkerController;
 use App\Http\Controllers\Api\AudioWorkerHealthController;
 use App\Http\Controllers\Api\ClusterController;
+use App\Http\Controllers\Api\LlmClusterController;
 use App\Http\Controllers\Api\InternalAudioAnalysisController;
 use App\Http\Controllers\Api\InternalDiscordController;
 use App\Http\Controllers\Api\InternalRadioController;
@@ -312,6 +313,22 @@ Route::middleware(['auth:sanctum'])->prefix('cluster/worker')->group(function ()
     Route::get('/task', [ClusterController::class, 'requestClusterTask'])->name('api.cluster.worker.task');
     Route::post('/tasks/{taskId}/result', [ClusterController::class, 'submitClusterResult'])
         ->name('api.cluster.worker.result');
+});
+
+// LLM Cluster API
+Route::middleware(['throttle:60,1'])->prefix('llm')->group(function () {
+    Route::get('/models', [LlmClusterController::class, 'listModels'])->name('api.llm.models');
+    Route::get('/stats', [LlmClusterController::class, 'getStats'])->name('api.llm.stats');
+    Route::get('/jobs', [LlmClusterController::class, 'listJobs'])->name('api.llm.jobs');
+    Route::post('/inference', [LlmClusterController::class, 'inference'])->name('api.llm.inference');
+    Route::get('/jobs/{id}', [LlmClusterController::class, 'getJobStatus'])->name('api.llm.job.status');
+});
+
+// LLM Cluster Worker Endpoints
+Route::middleware(['auth:sanctum'])->prefix('llm/worker')->group(function () {
+    Route::get('/job', [LlmClusterController::class, 'requestJob'])->name('api.llm.worker.job');
+    Route::post('/jobs/{jobId}/result', [LlmClusterController::class, 'submitResult'])
+        ->name('api.llm.worker.result');
 });
 
 // Wiki.js OAuth2 SSO
