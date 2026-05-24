@@ -240,9 +240,9 @@ echo ""
 command -v docker >/dev/null 2>&1 || { echo "Docker is required but not installed."; exit 1; }
 
 # Create worker directory
-WORKER_DIR="$HOME/.arborisis-worker"
-mkdir -p "$WORKER_DIR"
-cd "$WORKER_DIR"
+WORKER_DIR="\$HOME/.arborisis-worker"
+mkdir -p "\$WORKER_DIR"
+cd "\$WORKER_DIR"
 
 # Download worker image
 echo "Pulling worker image..."
@@ -277,7 +277,7 @@ EOF
 echo ""
 echo "Setup complete!"
 echo "To start the worker:"
-echo "  cd $WORKER_DIR && docker compose up -d"
+echo "  cd \$WORKER_DIR && docker compose up -d"
 echo ""
 echo "To view logs:"
 echo "  docker compose logs -f"
