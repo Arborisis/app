@@ -1,60 +1,86 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { Link } from '@inertiajs/vue3';
 
-const biomes = ref([
-    {
-        id: 'forest',
-        title: 'La Forêt',
-        subtitle: 'Chapitre I',
-        description: 'Entrez dans le silence des bois anciens. Chaque pas révèle un nouveau chœur : chant des oiseaux, craquement des branches, murmure du vent dans les cimes.',
-        image: '/images/biomes/forest.jpg',
-        stats: { sounds: 4523, species: 128 },
-        color: '#34D399',
+const props = defineProps({
+    biomes: {
+        type: Array,
+        default: () => [],
     },
-    {
-        id: 'coast',
-        title: 'La Côte',
-        subtitle: 'Chapitre II',
-        description: 'L\'océan en mémoire. Des vagues qui s\'écrasent sur les falaises aux marées qui recouvrent les estuaires — capturez la puissance brute de la mer.',
-        image: '/images/biomes/coast.jpg',
-        stats: { sounds: 2156, species: 89 },
-        color: '#60A5FA',
-    },
-    {
-        id: 'mountain',
-        title: 'La Montagne',
-        subtitle: 'Chapitre III',
-        description: 'L\'altitude du son. Écoutez le vent traverser les crêtes alpines et les glaciers craquer sous le poids du temps.',
-        image: '/images/biomes/mountain.jpg',
-        stats: { sounds: 1876, species: 67 },
-        color: '#A78BFA',
-    },
-    {
-        id: 'desert',
-        title: 'Le Désert',
-        subtitle: 'Chapitre IV',
-        description: 'Le silence absolu. Dans l\'immensité des dunes, chaque son devient précieux. Découvrez la beauté du minimalisme acoustique.',
-        image: '/images/biomes/desert.jpg',
-        stats: { sounds: 432, species: 34 },
-        color: '#FBBF24',
-    },
-    {
-        id: 'mangrove',
-        title: 'La Mangrove',
-        subtitle: 'Chapitre V',
-        description: 'La nuit vivante. Entre terre et mer, les mangroves abritent des chorales d\'insectes et d\'amphibiens qui créent des symphonies nocturnes.',
-        image: '/images/biomes/mangrove.jpg',
-        stats: { sounds: 987, species: 156 },
-        color: '#F472B6',
-    },
-]);
+});
 
 const activeBiome = ref(0);
 const sectionRef = ref(null);
 
+// Static biome metadata (descriptions, colors, images) — NOT stats
+const biomeMeta = {
+    forest: {
+        subtitle: 'Chapitre I',
+        description: 'Entrez dans le silence des bois anciens. Chaque pas révèle un nouveau chœur : chant des oiseaux, craquement des branches, murmure du vent dans les cimes.',
+        image: '/images/biomes/forest.jpg',
+        color: '#34D399',
+    },
+    coast: {
+        subtitle: 'Chapitre II',
+        description: 'L\'océan en mémoire. Des vagues qui s\'écrasent sur les falaises aux marées qui recouvrent les estuaires — capturez la puissance brute de la mer.',
+        image: '/images/biomes/coast.jpg',
+        color: '#60A5FA',
+    },
+    mountain: {
+        subtitle: 'Chapitre III',
+        description: 'L\'altitude du son. Écoutez le vent traverser les crêtes alpines et les glaciers craquer sous le poids du temps.',
+        image: '/images/biomes/mountain.jpg',
+        color: '#A78BFA',
+    },
+    desert: {
+        subtitle: 'Chapitre IV',
+        description: 'Le silence absolu. Dans l\'immensité des dunes, chaque son devient précieux. Découvrez la beauté du minimalisme acoustique.',
+        image: '/images/biomes/desert.jpg',
+        color: '#FBBF24',
+    },
+    mangrove: {
+        subtitle: 'Chapitre V',
+        description: 'La nuit vivante. Entre terre et mer, les mangroves abritent des chorales d\'insectes et d\'amphibiens qui créent des symphonies nocturnes.',
+        image: '/images/biomes/mangrove.jpg',
+        color: '#F472B6',
+    },
+};
+
+// Merge backend data with static metadata
+const mergedBiomes = computed(() => {
+    if (!props.biomes || props.biomes.length === 0) {
+        // Fallback: show biomes without stats if backend doesn't provide them
+        return Object.entries(biomeMeta).map(([id, meta]) => ({
+            id,
+            ...meta,
+            title: getBiomeTitle(id),
+            stats: null, // No stats available
+        }));
+    }
+    
+    return props.biomes.map(biome => {
+        const meta = biomeMeta[biome.id] || {};
+        return {
+            ...biome,
+            ...meta,
+            title: biome.name || getBiomeTitle(biome.id),
+            stats: biome.stats || null,
+        };
+    });
+});
+
+function getBiomeTitle(id) {
+    const titles = {
+        forest: 'La Forêt',
+        coast: 'La Côte',
+        mountain: 'La Montagne',
+        desert: 'Le Désert',
+        mangrove: 'La Mangrove',
+    };
+    return titles[id] || id;
+}
+
 onMounted(() => {
-    // Intersection observer for section visibility
     const observer = new IntersectionObserver(
         (entries) => {
             entries.forEach((entry) => {
@@ -87,11 +113,11 @@ onMounted(() => {
             </div>
         </div>
 
-        <!-- Biome cards - horizontal scroll on mobile, grid on desktop -->
+        <!-- Biome cards -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div
-                    v-for="(biome, index) in biomes"
+                    v-for="(biome, index) in mergedBiomes"
                     :key="biome.id"
                     class="group relative aspect-[4/5] rounded-2xl overflow-hidden cursor-pointer transition-all duration-700"
                     :class="[
@@ -135,14 +161,17 @@ onMounted(() => {
                             {{ biome.description }}
                         </p>
 
-                        <!-- Stats -->
-                        <div class="flex gap-6 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 delay-100">
-                            <div>
-                                <div class="text-lg font-semibold text-[#E8F0EC]">{{ biome.stats.sounds.toLocaleString() }}</div>
+                        <!-- Stats from backend — only show if available -->
+                        <div 
+                            v-if="biome.stats"
+                            class="flex gap-6 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 delay-100"
+                        >
+                            <div v-if="biome.stats.sounds !== undefined">
+                                <div class="text-lg font-semibold text-[#E8F0EC]">{{ biome.stats.sounds.toLocaleString('fr-FR') }}</div>
                                 <div class="text-xs text-[#5A6B65] uppercase tracking-wider">Sons</div>
                             </div>
-                            <div class="w-px bg-[#FFFFFF0A]" />
-                            <div>
+                            <div v-if="biome.stats.sounds !== undefined && biome.stats.species !== undefined" class="w-px bg-[#FFFFFF0A]" />
+                            <div v-if="biome.stats.species !== undefined">
                                 <div class="text-lg font-semibold text-[#E8F0EC]">{{ biome.stats.species }}</div>
                                 <div class="text-xs text-[#5A6B65] uppercase tracking-wider">Espèces</div>
                             </div>

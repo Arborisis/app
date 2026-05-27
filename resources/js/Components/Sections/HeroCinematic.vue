@@ -94,25 +94,34 @@ onMounted(() => {
                     </Link>
                 </div>
                 
-                <!-- Stats -->
+                <!-- Stats — strictly from backend, no fallbacks -->
                 <div 
+                    v-if="stats && (stats.sounds !== undefined || stats.creators !== undefined || stats.countries !== undefined)"
                     class="flex gap-8 transition-all duration-1000 delay-700 ease-out"
                     :class="isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'"
                 >
-                    <div>
-                        <div class="text-3xl font-semibold text-[#E8F0EC] tracking-tight">{{ stats?.sounds || 0 }}+</div>
+                    <div v-if="stats.sounds !== undefined">
+                        <div class="text-3xl font-semibold text-[#E8F0EC] tracking-tight">{{ stats.sounds.toLocaleString('fr-FR') }}</div>
                         <div class="text-xs text-[#5A6B65] uppercase tracking-widest mt-1">Sons</div>
                     </div>
-                    <div class="w-px bg-[#FFFFFF0A]" />
-                    <div>
-                        <div class="text-3xl font-semibold text-[#E8F0EC] tracking-tight">{{ stats?.creators || 0 }}+</div>
+                    <div v-if="stats.sounds !== undefined && stats.creators !== undefined" class="w-px bg-[#FFFFFF0A]" />
+                    <div v-if="stats.creators !== undefined">
+                        <div class="text-3xl font-semibold text-[#E8F0EC] tracking-tight">{{ stats.creators.toLocaleString('fr-FR') }}</div>
                         <div class="text-xs text-[#5A6B65] uppercase tracking-widest mt-1">Créateurs</div>
                     </div>
-                    <div class="w-px bg-[#FFFFFF0A]" />
-                    <div>
-                        <div class="text-3xl font-semibold text-[#E8F0EC] tracking-tight">{{ stats?.countries || 0 }}+</div>
+                    <div v-if="stats.creators !== undefined && stats.countries !== undefined" class="w-px bg-[#FFFFFF0A]" />
+                    <div v-if="stats.countries !== undefined">
+                        <div class="text-3xl font-semibold text-[#E8F0EC] tracking-tight">{{ stats.countries.toLocaleString('fr-FR') }}</div>
                         <div class="text-xs text-[#5A6B65] uppercase tracking-widest mt-1">Pays</div>
                     </div>
+                </div>
+                <!-- Loading state if no stats yet -->
+                <div 
+                    v-else
+                    class="flex gap-8 transition-all duration-1000 delay-700 ease-out"
+                    :class="isLoaded ? 'opacity-100' : 'opacity-0'"
+                >
+                    <div class="text-xs text-[#5A6B65] uppercase tracking-widest">Chargement des statistiques...</div>
                 </div>
             </div>
         </div>
