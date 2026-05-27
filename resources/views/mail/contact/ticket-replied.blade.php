@@ -21,7 +21,7 @@
         <td style="padding: 24px; background-color: rgba(52, 211, 153, 0.04); border-left: 3px solid #34D399; border-radius: 0 14px 14px 0;">
             <p style="margin: 0 0 12px; font-family: 'DM Sans', system-ui, sans-serif; font-size: 11px; font-weight: 500; color: #34D399; letter-spacing: 0.1em; text-transform: uppercase; mso-line-height-rule: exactly;">Réponse de l'équipe</p>
             <div style="margin: 0; font-family: 'DM Sans', system-ui, sans-serif; font-size: 15px; color: #F3F0E7; line-height: 1.7; mso-line-height-rule: exactly;">
-                {!! nl2br(e($reply)) !!}
+                {!! nl2br(e(app(\App\Services\Mail\HtmlSanitizerService::class)->sanitizeSimple($reply))) !!}
             </div>
         </td>
     </tr>

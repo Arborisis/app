@@ -29,7 +29,7 @@
 <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
     <tr>
         <td style="font-family: 'DM Sans', system-ui, sans-serif; font-size: 16px; color: #E8E4D9; line-height: 1.7; mso-line-height-rule: exactly;">
-            {!! $campaign->content_html !!}
+            {!! app(\App\Services\Mail\HtmlSanitizerService::class)->sanitizeForEmail($campaign->content_html) !!}
         </td>
     </tr>
 </table>
