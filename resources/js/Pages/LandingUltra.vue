@@ -1,7 +1,7 @@
 <script setup>
 import { Head } from '@inertiajs/vue3';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
-import HeroCinematic from '@/Components/Sections/HeroCinematic.vue';
+import Scrollytelling from '@/Components/Sections/Scrollytelling.vue';
 import BiomeExplorer from '@/Components/Sections/BiomeExplorer.vue';
 import SoundGrid from '@/Components/Sections/SoundGrid.vue';
 import StatsCounter from '@/Components/Sections/StatsCounter.vue';
@@ -23,8 +23,8 @@ const props = defineProps({
 <template>
     <Head title="Le vivant s'écoute — Arborisis" />
     <GuestLayout>
-        <!-- Hero with Three.js forest -->
-        <HeroCinematic :stats="stats" />
+        <!-- Hero with cinematic scrollytelling -->
+        <Scrollytelling :stats="stats" />
 
         <!-- Biome explorer -->
         <BiomeExplorer />
