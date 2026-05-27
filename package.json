@@ -33,6 +33,7 @@
         "@fontsource/dm-sans": "^5.2.8",
         "@fontsource/jetbrains-mono": "^5.2.8",
         "@vue-leaflet/vue-leaflet": "^0.10.1",
+        "gsap": "^3.15.0",
         "laravel-echo": "^2.3.4",
         "leaflet": "^1.9.4",
         "leaflet.markercluster": "^1.5.3",

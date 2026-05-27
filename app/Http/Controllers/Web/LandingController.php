@@ -91,7 +91,7 @@ class LandingController extends Controller
             ])->toArray();
         });
 
-        return Inertia::render('Landing', [
+        return Inertia::render('LandingUltra', [
             'stats' => $stats,
             'featuredSounds' => $featuredSounds,
             'featuredCreators' => $featuredCreators,
